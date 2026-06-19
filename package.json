@@ -12,7 +12,9 @@
     "db:new": "supabase migration new",
     "db:push": "supabase db push",
     "ai:secret": "supabase secrets set",
-    "ai:deploy": "supabase functions deploy ai"
+    "ai:deploy": "supabase functions deploy ai",
+    "shopify:secret": "supabase secrets set",
+    "shopify:deploy": "supabase functions deploy shopify-products"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
