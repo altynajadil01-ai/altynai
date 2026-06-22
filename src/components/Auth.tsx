@@ -25,6 +25,10 @@ function getGoogleAuthMessage(errorMessage: string) {
   return errorMessage;
 }
 
+function getAuthRedirectUrl() {
+  return `${window.location.origin}/`;
+}
+
 export function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,7 +44,10 @@ export function Auth() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: getAuthRedirectUrl(),
+        queryParams: {
+          prompt: 'select_account',
+        },
       },
     });
 

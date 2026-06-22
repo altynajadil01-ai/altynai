@@ -27,6 +27,16 @@ type ProfileCheck = {
   favorite_colors: string[];
 };
 
+async function ensureProfile(userId: string, userEmail: string) {
+  await supabase.from('profiles').upsert(
+    {
+      user_id: userId,
+      display_name: userEmail.split('@')[0] ?? '',
+    },
+    { ignoreDuplicates: true, onConflict: 'user_id' },
+  );
+}
+
 export default function App() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -39,11 +49,17 @@ export default function App() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
+      if (data.session?.user) {
+        void ensureProfile(data.session.user.id, data.session.user.email ?? '');
+      }
       setLoading(false);
     });
 
     const { data: sub } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       setSession(nextSession);
+      if (nextSession?.user) {
+        void ensureProfile(nextSession.user.id, nextSession.user.email ?? '');
+      }
       if (!nextSession) {
         setPage('today');
         setNeedsOnboarding(false);
@@ -94,7 +110,6 @@ export default function App() {
     <main className="container">
       <header className="header">
         <div className="brand">
-          <img className="logo-image" src="/stylelab-logo-tag.jpeg" alt="StyleLab logo" />
           <div>
             <h1>StyleLab</h1>
             <p>outfit generator</p>
@@ -123,10 +138,12 @@ export default function App() {
                 Коллекция
               </button>
             </nav>
-            <button className="ghost" onClick={() => supabase.auth.signOut()}>
-              Выйти
-            </button>
           </div>
+        )}
+        {session && (
+          <button className="ghost logout-button header-logout" onClick={() => supabase.auth.signOut()} type="button">
+            Выйти
+          </button>
         )}
       </header>
 

@@ -79,11 +79,11 @@ const colors = [
   'зеленый',
   'голубой',
   'синий',
-  'золотой',
+  'пудрово-розовый',
   'розовый',
   'холодный мятный',
   'серый шалфей',
-  'светло-золотой',
+  'нежно-розовый',
   'чернильный',
   'стальной синий',
 ];
@@ -288,7 +288,11 @@ export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product
       <div className="hero-band">
         <div className="intro">
           <p className="hello">Реальные бренды</p>
-          <h2>Каталог товаров для образов</h2>
+          <h2 className="catalog-title">
+            <span>Каталог</span>
+            <span>товаров для</span>
+            <span>образов</span>
+          </h2>
           <p>Добавляй настоящие вещи из магазинов: ссылку на товар, цену и картинку. Генератор сможет подбирать их под стиль, цвет и бюджет.</p>
         </div>
         <img className="today-hero-photo" src="/brand-catalog-hero-miu.jpeg" alt="Лейблы модных брендов крупным планом" />

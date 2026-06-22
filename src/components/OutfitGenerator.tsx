@@ -217,18 +217,18 @@ const wardrobeColors: PaletteColor[] = [
   { name: 'темно-синий', hex: '#1f365c' },
   { name: 'бордовый', hex: '#6f1836' },
   { name: 'сливовый', hex: '#8b6f2f' },
-  { name: 'винный', hex: '#9b7a32' },
+  { name: 'винный', hex: '#c95f82' },
   { name: 'красный', hex: '#b83b3b' },
   { name: 'оранжевый', hex: '#d98245' },
   { name: 'желтый', hex: '#efd96f' },
   { name: 'зеленый', hex: '#4f7d57' },
   { name: 'голубой', hex: '#86b6d9' },
   { name: 'синий', hex: '#2457a6' },
-  { name: 'золотой', hex: '#c9a44c' },
+  { name: 'пудрово-розовый', hex: '#f0a9bd' },
   { name: 'розовый', hex: '#e6a6b8' },
   { name: 'холодный мятный', hex: '#6f8f9f' },
   { name: 'серый шалфей', hex: '#7b8fa3' },
-  { name: 'светло-золотой', hex: '#ead28a' },
+  { name: 'нежно-розовый', hex: '#f6cfdc' },
   { name: 'чернильный', hex: '#243b5a' },
   { name: 'стальной синий', hex: '#5f6f86' },
 ];
@@ -261,7 +261,7 @@ const colorPairs: Record<string, PaletteColor[]> = {
     { name: 'графит', hex: '#3f4652' },
   ],
   серый: [
-    { name: 'светло-золотой', hex: '#ead28a' },
+    { name: 'нежно-розовый', hex: '#f6cfdc' },
     { name: 'темно-синий', hex: '#1f365c' },
     { name: 'белый', hex: '#ffffff' },
   ],
@@ -365,7 +365,7 @@ const colorPairs: Record<string, PaletteColor[]> = {
     { name: 'белый', hex: '#ffffff' },
     { name: 'дымчато-синий', hex: '#5f6f86' },
   ],
-  'светло-золотой': [
+  'нежно-розовый': [
     { name: 'серый', hex: '#8f9499' },
     { name: 'фарфоровый', hex: '#eef3f7' },
     { name: 'темно-синий', hex: '#1f365c' },
@@ -380,7 +380,7 @@ const colorPairs: Record<string, PaletteColor[]> = {
     { name: 'ледяной', hex: '#e5ebf1' },
     { name: 'графитовый', hex: '#232832' },
   ],
-  золотой: [
+  'пудрово-розовый': [
     { name: 'фарфоровый', hex: '#eef3f7' },
     { name: 'серый', hex: '#8f9499' },
     { name: 'серый шалфей', hex: '#7b8fa3' },
@@ -388,7 +388,7 @@ const colorPairs: Record<string, PaletteColor[]> = {
 };
 
 const seasonalAccents: Record<string, PaletteColor> = {
-  весна: { name: 'светло-золотой', hex: '#ead28a' },
+  весна: { name: 'нежно-розовый', hex: '#f6cfdc' },
   лето: { name: 'светлый винный', hex: '#d8b4c2' },
   осень: { name: 'дымчато-синий', hex: '#5f6f86' },
   зима: { name: 'ледяной', hex: '#d9edf2' },
@@ -1371,7 +1371,14 @@ export function OutfitGenerator({
       <div className="hero-band">
         <div className="intro">
           <p className="hello">Привет, {userEmail}</p>
-          <h2 className={autoToday ? 'today-title' : undefined}>{autoToday ? 'Образ на сегодня' : 'Собрать образ'}</h2>
+          <h2 className={autoToday ? 'today-title' : 'generator-title'}>
+            {autoToday ? 'Образ на сегодня' : (
+              <>
+                <span>Собрать</span>
+                <span>образ</span>
+              </>
+            )}
+          </h2>
           <p>
             {autoToday
               ? 'Быстрый подбор сам берет данные из профиля, учитывает погоду и сразу предлагает готовый вариант на день.'
@@ -1379,7 +1386,7 @@ export function OutfitGenerator({
           </p>
         </div>
         {autoToday ? (
-          <img className="today-hero-photo" src="/today-accessories.jpg" alt="Коллекция брендовых сумок и аксессуаров" />
+          <img className="today-hero-photo" src="/today-hero-miumiu-show.jpeg" alt="Показ Miu Miu на зеленом холме" />
         ) : (
           <img className="today-hero-photo" src="/generator-magazines.jpg" alt="Глянцевые fashion-журналы на витрине" />
         )}
@@ -1388,7 +1395,7 @@ export function OutfitGenerator({
       {autoToday && (
       <section className="today-panel" aria-label="Образ на сегодня">
         <div className="panel-copy-with-illustration">
-          <img className="toolbar-photo today-panel-photo" src="/today-panel-magazines.jpeg" alt="Стопки fashion-журналов" />
+          <img className="toolbar-photo today-panel-photo" src="/today-panel-moodboard.jpeg" alt="Стопки fashion-журналов" />
           <div>
             <h3>Что надеть сегодня</h3>
             <p>
@@ -1743,7 +1750,7 @@ export function OutfitGenerator({
         </div>
 
         <div className="brand-panel">
-          <img className="brand-panel-photo" src="/today-style-brands-fabric.jpeg" alt="Ткани и принты брендов для подбора стиля" />
+          <img className="brand-panel-photo" src="/brand-style-vogue-pink.jpeg" alt="Розовая надпись Vogue для блока брендов" />
           <h3>Бренды под стиль</h3>
           <div className="brand-list">
             {brands.map((brand) => (

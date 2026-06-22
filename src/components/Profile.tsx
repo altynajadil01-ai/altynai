@@ -56,15 +56,15 @@ const colorOptions = [
   { name: 'зеленый', hex: '#4f7d57' },
   { name: 'голубой', hex: '#86b6d9' },
   { name: 'синий', hex: '#2457a6' },
-  { name: 'золотой', hex: '#c9a44c' },
+  { name: 'пудрово-розовый', hex: '#f0a9bd' },
   { name: 'розовый', hex: '#e6a6b8' },
   { name: 'бордовый', hex: '#6f1836' },
   { name: 'сливовый', hex: '#8b6f2f' },
-  { name: 'винный', hex: '#9b7a32' },
+  { name: 'винный', hex: '#c95f82' },
   { name: 'чернильный', hex: '#243b5a' },
   { name: 'серый шалфей', hex: '#7b8fa3' },
   { name: 'деним', hex: '#3f6f9f' },
-  { name: 'светло-золотой', hex: '#ead28a' },
+  { name: 'нежно-розовый', hex: '#f6cfdc' },
 ];
 
 const emptyProfile: ProfileForm = {
