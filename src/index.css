@@ -587,7 +587,8 @@ button.small { padding: 6px 10px; font-size: 14px; }
 .collection-season-photo {
   width: 96px;
   height: 96px;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
 }
 
 .wardrobe-count-photo {
@@ -599,7 +600,29 @@ button.small { padding: 6px 10px; font-size: 14px; }
 .result-head-photo {
   width: 104px;
   height: 104px;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center;
+}
+
+.remake-panel-photo {
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.today-panel-photo {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.weather-panel-photo {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  object-position: center;
 }
 
 .list { list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
@@ -2748,6 +2771,16 @@ label {
   width: 100%;
   height: 118px;
   box-shadow: none;
+}
+
+.brand-panel-photo {
+  display: block;
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  object-position: center;
+  border: 1px solid #111;
+  background: #fff;
 }
 
 .brand-window {

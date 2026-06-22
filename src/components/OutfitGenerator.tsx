@@ -1388,11 +1388,7 @@ export function OutfitGenerator({
       {autoToday && (
       <section className="today-panel" aria-label="Образ на сегодня">
         <div className="panel-copy-with-illustration">
-          <div className="editorial-thumb today-style-thumb" aria-hidden="true">
-            <span className="today-style-card" />
-            <span className="today-style-jacket" />
-            <span className="today-style-pearl" />
-          </div>
+          <img className="toolbar-photo today-panel-photo" src="/today-panel-magazines.jpeg" alt="Стопки fashion-журналов" />
           <div>
             <h3>Что надеть сегодня</h3>
             <p>
@@ -1631,7 +1627,7 @@ export function OutfitGenerator({
       <article className="result-panel featured-result" ref={resultRef}>
         <div className="result-head">
           <div className="panel-copy-with-illustration">
-            <img className="toolbar-photo result-head-photo" src="/generator-ready-look-skateboards.jpeg" alt="Fashion-иллюстрация для готового образа" />
+            <img className="toolbar-photo result-head-photo" src="/generator-ready-look-clothes-rack.jpeg" alt="Fashion-иллюстрация для готового образа" />
             <h3>Готовый образ</h3>
           </div>
           <button type="button" onClick={saveCurrentOutfit}>
@@ -1690,11 +1686,7 @@ export function OutfitGenerator({
         <>
       <section className="remake-panel" aria-label="Переделать образ">
         <div className="panel-copy-with-illustration">
-          <div className="editorial-thumb remake-thumb" aria-hidden="true">
-            <span className="thumb-card thumb-card-light" />
-            <span className="thumb-card thumb-card-dark" />
-            <span className="thumb-pearl-line" />
-          </div>
+          <img className="toolbar-photo remake-panel-photo" src="/remake-look-dresses.jpeg" alt="Платья на вешалках для переделки образа" />
           <div>
             <h3>Переделать образ</h3>
             <p>Быстро измени текущий outfit под ситуацию.</p>
@@ -1715,11 +1707,7 @@ export function OutfitGenerator({
       </section>
 
       <section className="weather-card" aria-label="Погода">
-        <div className="editorial-thumb weather-thumb" aria-hidden="true">
-          <span className="weather-moon" />
-          <span className="weather-cloud" />
-          <span className="weather-rain" />
-        </div>
+        <img className="toolbar-photo weather-panel-photo" src="/weather-panel-rainy.jpeg" alt="Иллюстрация погоды rainy day" />
         <div>
           <h3>Погода</h3>
           <p>{weatherStatus}</p>
@@ -1755,11 +1743,7 @@ export function OutfitGenerator({
         </div>
 
         <div className="brand-panel">
-          <div className="editorial-thumb brand-thumb" aria-hidden="true">
-            <span className="brand-window" />
-            <span className="brand-bag" />
-            <span className="brand-tag-line" />
-          </div>
+          <img className="brand-panel-photo" src="/today-style-brands-fabric.jpeg" alt="Ткани и принты брендов для подбора стиля" />
           <h3>Бренды под стиль</h3>
           <div className="brand-list">
             {brands.map((brand) => (

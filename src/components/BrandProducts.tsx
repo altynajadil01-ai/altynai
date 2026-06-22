@@ -291,7 +291,7 @@ export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product
           <h2>Каталог товаров для образов</h2>
           <p>Добавляй настоящие вещи из магазинов: ссылку на товар, цену и картинку. Генератор сможет подбирать их под стиль, цвет и бюджет.</p>
         </div>
-        <img className="today-hero-photo" src="/brand-catalog-labels.jpg" alt="Лейблы модных брендов крупным планом" />
+        <img className="today-hero-photo" src="/brand-catalog-hero-miu.jpeg" alt="Лейблы модных брендов крупным планом" />
       </div>
 
       <section className="shopify-panel">
