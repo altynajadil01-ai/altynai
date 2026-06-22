@@ -79,11 +79,11 @@ const colors = [
   'зеленый',
   'голубой',
   'синий',
-  'фиолетовый',
+  'золотой',
   'розовый',
   'холодный мятный',
   'серый шалфей',
-  'ледяной сиреневый',
+  'светло-золотой',
   'чернильный',
   'стальной синий',
 ];
@@ -429,10 +429,7 @@ export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product
 
       <div className="wardrobe-toolbar">
         <div className="toolbar-title">
-          <div className="editorial-thumb product-thumb compact-thumb" aria-hidden="true">
-            <span className="product-bag" />
-            <span className="product-box" />
-          </div>
+          <img className="toolbar-photo product-toolbar-photo" src="/brand-empty-shopping-bags.jpeg" alt="Иллюстрация с пакетами модных брендов" />
           <strong>{products.length} товаров</strong>
         </div>
         <select value={filter} onChange={(e) => setFilter(e.target.value)}>
@@ -451,10 +448,6 @@ export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product
         <p className="empty">Загрузка...</p>
       ) : filteredProducts.length === 0 ? (
         <div className="empty-state">
-          <div className="editorial-thumb empty-thumb product-empty-thumb" aria-hidden="true">
-            <span className="empty-frame" />
-            <span className="empty-plus" />
-          </div>
           <p>Пока нет товаров. Добавь первую реальную вещь выше.</p>
         </div>
       ) : (

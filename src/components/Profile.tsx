@@ -8,6 +8,8 @@ type ProfileForm = {
   budget: string;
   sizes: string;
   favoriteColors: string[];
+  preferredBrands: string;
+  avoidDresses: boolean;
 };
 
 type ProfileRow = {
@@ -17,7 +19,24 @@ type ProfileRow = {
   budget: string;
   sizes: string;
   favorite_colors: string[];
+  preferred_brands?: string[];
+  avoid_dresses?: boolean;
 };
+
+type BaseProfilePayload = {
+  user_id: string;
+  display_name: string;
+  city: string;
+  favorite_style: string;
+  budget: string;
+  sizes: string;
+  favorite_colors: string[];
+  updated_at: string;
+};
+
+function isMissingPreferenceColumn(errorMessage: string) {
+  return errorMessage.includes('preferred_brands') || errorMessage.includes('avoid_dresses');
+}
 
 const styleOptions = ['спокойный', 'уличный', 'элегантный', 'спортивный', 'винтажный', 'минимализм'];
 const budgetOptions = ['эконом', 'средний', 'премиум'];
@@ -37,15 +56,15 @@ const colorOptions = [
   { name: 'зеленый', hex: '#4f7d57' },
   { name: 'голубой', hex: '#86b6d9' },
   { name: 'синий', hex: '#2457a6' },
-  { name: 'фиолетовый', hex: '#72519a' },
+  { name: 'золотой', hex: '#c9a44c' },
   { name: 'розовый', hex: '#e6a6b8' },
   { name: 'бордовый', hex: '#6f1836' },
-  { name: 'сливовый', hex: '#3a2447' },
-  { name: 'винный', hex: '#4b1028' },
+  { name: 'сливовый', hex: '#8b6f2f' },
+  { name: 'винный', hex: '#9b7a32' },
   { name: 'чернильный', hex: '#243b5a' },
   { name: 'серый шалфей', hex: '#7b8fa3' },
   { name: 'деним', hex: '#3f6f9f' },
-  { name: 'ледяной сиреневый', hex: '#c8d7ee' },
+  { name: 'светло-золотой', hex: '#ead28a' },
 ];
 
 const emptyProfile: ProfileForm = {
@@ -55,6 +74,8 @@ const emptyProfile: ProfileForm = {
   budget: budgetOptions[1],
   sizes: '',
   favoriteColors: [],
+  preferredBrands: '',
+  avoidDresses: false,
 };
 
 function rowToForm(row: ProfileRow): ProfileForm {
@@ -65,6 +86,8 @@ function rowToForm(row: ProfileRow): ProfileForm {
     budget: row.budget || budgetOptions[1],
     sizes: row.sizes,
     favoriteColors: row.favorite_colors ?? [],
+    preferredBrands: (row.preferred_brands ?? []).join(', '),
+    avoidDresses: row.avoid_dresses ?? false,
   };
 }
 
@@ -81,11 +104,23 @@ export function Profile({ userId, userEmail }: { userId: string; userEmail: stri
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('display_name, city, favorite_style, budget, sizes, favorite_colors')
+        .select('display_name, city, favorite_style, budget, sizes, favorite_colors, preferred_brands, avoid_dresses')
         .eq('user_id', userId)
         .maybeSingle<ProfileRow>();
 
-      if (error) {
+      if (error && isMissingPreferenceColumn(error.message)) {
+        const { data: baseData, error: baseError } = await supabase
+          .from('profiles')
+          .select('display_name, city, favorite_style, budget, sizes, favorite_colors')
+          .eq('user_id', userId)
+          .maybeSingle<ProfileRow>();
+
+        if (baseError) {
+          setMessage('РџСЂРѕС„РёР»СЊ РїРѕРєР° РЅРµ Р·Р°РіСЂСѓР¶РµРЅ. Р•СЃР»Рё С‚Р°Р±Р»РёС†С‹ РµС‰Рµ РЅРµС‚, РїСЂРёРјРµРЅРёС‚Рµ РјРёРіСЂР°С†РёРё.');
+        } else if (baseData) {
+          setForm(rowToForm(baseData));
+        }
+      } else if (error) {
         setMessage('Профиль пока не загружен. Если таблицы еще нет, примените миграции.');
       } else if (data) {
         setForm(rowToForm(data));
@@ -97,8 +132,12 @@ export function Profile({ userId, userEmail }: { userId: string; userEmail: stri
     loadProfile();
   }, [userId]);
 
-  function updateField(field: keyof Omit<ProfileForm, 'favoriteColors'>, value: string) {
+  function updateField(field: keyof Omit<ProfileForm, 'favoriteColors' | 'avoidDresses'>, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateAvoidDresses(value: boolean) {
+    setForm((current) => ({ ...current, avoidDresses: value }));
   }
 
   function toggleColor(color: string) {
@@ -118,7 +157,7 @@ export function Profile({ userId, userEmail }: { userId: string; userEmail: stri
     setSaving(true);
     setMessage('');
 
-    const { error } = await supabase.from('profiles').upsert({
+    const basePayload: BaseProfilePayload = {
       user_id: userId,
       display_name: form.displayName.trim(),
       city: form.city.trim(),
@@ -127,7 +166,23 @@ export function Profile({ userId, userEmail }: { userId: string; userEmail: stri
       sizes: form.sizes.trim(),
       favorite_colors: form.favoriteColors,
       updated_at: new Date().toISOString(),
+    };
+
+    const { error } = await supabase.from('profiles').upsert({
+      ...basePayload,
+      preferred_brands: form.preferredBrands
+        .split(',')
+        .map((brand) => brand.trim())
+        .filter(Boolean),
+      avoid_dresses: form.avoidDresses,
     });
+
+    if (error && isMissingPreferenceColumn(error.message)) {
+      const { error: baseError } = await supabase.from('profiles').upsert(basePayload);
+      setMessage(baseError ? baseError.message : 'РџСЂРѕС„РёР»СЊ СЃРѕС…СЂР°РЅРµРЅ.');
+      setSaving(false);
+      return;
+    }
 
     setMessage(error ? error.message : 'Профиль сохранен.');
     setSaving(false);
@@ -188,6 +243,20 @@ export function Profile({ userId, userEmail }: { userId: string; userEmail: stri
             value={form.sizes}
             onChange={(e) => updateField('sizes', e.target.value)}
           />
+        </label>
+
+        <label className="wide">
+          Любимые бренды
+          <input
+            placeholder="например: Zara, Mango, COS"
+            value={form.preferredBrands}
+            onChange={(e) => updateField('preferredBrands', e.target.value)}
+          />
+        </label>
+
+        <label className="wide filter-check inline">
+          <input checked={form.avoidDresses} onChange={(e) => updateAvoidDresses(e.target.checked)} type="checkbox" />
+          Не предлагать платья в генераторе
         </label>
 
         <div className="wide profile-colors">

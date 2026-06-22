@@ -27,15 +27,15 @@ const colorOptions = [
   { name: 'зеленый', hex: '#4f7d57' },
   { name: 'голубой', hex: '#86b6d9' },
   { name: 'синий', hex: '#2457a6' },
-  { name: 'фиолетовый', hex: '#72519a' },
+  { name: 'золотой', hex: '#c9a44c' },
   { name: 'розовый', hex: '#e6a6b8' },
   { name: 'бордовый', hex: '#6f1836' },
-  { name: 'сливовый', hex: '#3a2447' },
-  { name: 'винный', hex: '#4b1028' },
+  { name: 'сливовый', hex: '#8b6f2f' },
+  { name: 'винный', hex: '#9b7a32' },
   { name: 'чернильный', hex: '#243b5a' },
   { name: 'серый шалфей', hex: '#7b8fa3' },
   { name: 'деним', hex: '#3f6f9f' },
-  { name: 'ледяной сиреневый', hex: '#c8d7ee' },
+  { name: 'светло-золотой', hex: '#ead28a' },
 ];
 
 const emptyForm: OnboardingForm = {

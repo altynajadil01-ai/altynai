@@ -39,8 +39,8 @@ const colorHexByName: Record<string, string> = {
   'светло-серый': '#d7dde5',
   графитовый: '#232832',
   бордовый: '#6f1836',
-  сливовый: '#3a2447',
-  винный: '#4b1028',
+  сливовый: '#8b6f2f',
+  винный: '#9b7a32',
   чернильный: '#243b5a',
   деним: '#3f6f9f',
   'синий деним': '#3f6f9f',
@@ -137,11 +137,7 @@ export function SavedOutfits({ userId }: { userId: string }) {
 
       <div className="collection-filters">
         <div className="filter-illustration">
-          <div className="editorial-thumb season-thumb compact-thumb" aria-hidden="true">
-            <span className="season-sun" />
-            <span className="season-card" />
-            <span className="season-line" />
-          </div>
+          <img className="toolbar-photo collection-season-photo" src="/collection-season-lipsticks.jpeg" alt="Fashion-иллюстрация помад" />
         </div>
         <label>
           Сезон

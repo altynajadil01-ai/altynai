@@ -63,7 +63,13 @@ type ProfilePreferences = {
   favorite_style: string;
   budget: string;
   favorite_colors: string[];
+  preferred_brands?: string[];
+  avoid_dresses?: boolean;
 };
+
+function isMissingProfilePreferenceColumn(errorMessage: string) {
+  return errorMessage.includes('preferred_brands') || errorMessage.includes('avoid_dresses');
+}
 
 type DetailTab = 'look' | 'photo' | 'score' | 'capsule' | 'assistant';
 
@@ -210,19 +216,19 @@ const wardrobeColors: PaletteColor[] = [
   { name: 'синий деним', hex: '#3f6f9f' },
   { name: 'темно-синий', hex: '#1f365c' },
   { name: 'бордовый', hex: '#6f1836' },
-  { name: 'сливовый', hex: '#3a2447' },
-  { name: 'винный', hex: '#4b1028' },
+  { name: 'сливовый', hex: '#8b6f2f' },
+  { name: 'винный', hex: '#9b7a32' },
   { name: 'красный', hex: '#b83b3b' },
   { name: 'оранжевый', hex: '#d98245' },
   { name: 'желтый', hex: '#efd96f' },
   { name: 'зеленый', hex: '#4f7d57' },
   { name: 'голубой', hex: '#86b6d9' },
   { name: 'синий', hex: '#2457a6' },
-  { name: 'фиолетовый', hex: '#72519a' },
+  { name: 'золотой', hex: '#c9a44c' },
   { name: 'розовый', hex: '#e6a6b8' },
   { name: 'холодный мятный', hex: '#6f8f9f' },
   { name: 'серый шалфей', hex: '#7b8fa3' },
-  { name: 'ледяной сиреневый', hex: '#c8d7ee' },
+  { name: 'светло-золотой', hex: '#ead28a' },
   { name: 'чернильный', hex: '#243b5a' },
   { name: 'стальной синий', hex: '#5f6f86' },
 ];
@@ -255,7 +261,7 @@ const colorPairs: Record<string, PaletteColor[]> = {
     { name: 'графит', hex: '#3f4652' },
   ],
   серый: [
-    { name: 'ледяной сиреневый', hex: '#c8d7ee' },
+    { name: 'светло-золотой', hex: '#ead28a' },
     { name: 'темно-синий', hex: '#1f365c' },
     { name: 'белый', hex: '#ffffff' },
   ],
@@ -359,7 +365,7 @@ const colorPairs: Record<string, PaletteColor[]> = {
     { name: 'белый', hex: '#ffffff' },
     { name: 'дымчато-синий', hex: '#5f6f86' },
   ],
-  'ледяной сиреневый': [
+  'светло-золотой': [
     { name: 'серый', hex: '#8f9499' },
     { name: 'фарфоровый', hex: '#eef3f7' },
     { name: 'темно-синий', hex: '#1f365c' },
@@ -374,7 +380,7 @@ const colorPairs: Record<string, PaletteColor[]> = {
     { name: 'ледяной', hex: '#e5ebf1' },
     { name: 'графитовый', hex: '#232832' },
   ],
-  фиолетовый: [
+  золотой: [
     { name: 'фарфоровый', hex: '#eef3f7' },
     { name: 'серый', hex: '#8f9499' },
     { name: 'серый шалфей', hex: '#7b8fa3' },
@@ -382,7 +388,7 @@ const colorPairs: Record<string, PaletteColor[]> = {
 };
 
 const seasonalAccents: Record<string, PaletteColor> = {
-  весна: { name: 'ледяной сиреневый', hex: '#d8d4e8' },
+  весна: { name: 'светло-золотой', hex: '#ead28a' },
   лето: { name: 'светлый винный', hex: '#d8b4c2' },
   осень: { name: 'дымчато-синий', hex: '#5f6f86' },
   зима: { name: 'ледяной', hex: '#d9edf2' },
@@ -674,6 +680,58 @@ const todayActionOptions = [
   { label: 'В школу', mood: 'спокойное', itemType: 'рубашка' },
 ];
 
+const eventOptions = [
+  { label: 'Школа', place: 'школа', mood: 'спокойное', itemType: 'рубашка' },
+  { label: 'Прогулка', place: 'городская прогулка', mood: 'уличное', itemType: 'джинсы' },
+  { label: 'Свидание', place: 'свидание', mood: 'романтичное', itemType: 'жакет' },
+  { label: 'День рождения', place: 'день рождения', mood: 'праздничное', itemType: 'жакет' },
+  { label: 'Ресторан', place: 'ресторан', mood: 'элегантное', itemType: 'брюки' },
+  { label: 'Поездка', place: 'поездка', mood: 'уютное', itemType: 'худи' },
+];
+
+function withoutDresses(options: string[], avoidDresses?: boolean) {
+  return avoidDresses ? options.filter((option) => option !== 'платье') : options;
+}
+
+function buildDailyTip(form: OutfitForm, weather: WeatherInfo | null, profile: ProfilePreferences | null) {
+  const brandText = profile?.preferred_brands?.length ? ` Из брендов сначала смотри: ${profile.preferred_brands.slice(0, 3).join(', ')}.` : '';
+  if (weather?.precipitation && weather.precipitation > 0) {
+    return `Сегодня лучше взять закрытую обувь и сумку, которую не страшно намочить.${brandText}`;
+  }
+  if (weather && weather.feelsLike <= 8) {
+    return `Добавь теплый слой: пальто, плотный жакет или свитер. Образ останется аккуратным, если низ будет спокойным.${brandText}`;
+  }
+  if (weather && weather.feelsLike >= 27) {
+    return `Выбирай легкий верх и свободную посадку. Один контрастный аксессуар сделает образ дороже.${brandText}`;
+  }
+  return `Для "${form.mood}" образа держи один главный акцент: ${form.itemType} ${form.wardrobeColor}, а остальное сделай спокойнее.${brandText}`;
+}
+
+function buildWardrobeAudit(items: WardrobeItem[]) {
+  const itemTypes = new Set(items.map((item) => item.item_type));
+  const colors = new Set(items.map((item) => item.color));
+  const suggestions: string[] = [];
+
+  if (items.length === 0) suggestions.push('Добавь хотя бы 5-7 вещей: верх, низ, обувь, слой и сумку.');
+  if (!itemTypes.has('жакет') && !itemTypes.has('кардиган')) suggestions.push('Не хватает аккуратного слоя: жакет или кардиган сильно расширит варианты.');
+  if (!itemTypes.has('брюки') && !itemTypes.has('джинсы')) suggestions.push('Добавь базовый низ: прямые джинсы или брюки.');
+  if (!itemTypes.has('кроссовки') && !itemTypes.has('ботинки')) suggestions.push('Нужна удобная обувь, чтобы образы были носибельными.');
+  if (!itemTypes.has('сумка')) suggestions.push('Сумка делает комплект законченным, добавь хотя бы одну базовую.');
+  if (colors.size <= 2 && items.length >= 4) suggestions.push('Палитра слишком узкая: добавь один светлый или акцентный цвет.');
+
+  return suggestions.slice(0, 4);
+}
+
+function buildWeekCalendar(form: OutfitForm, palette: PaletteColor[]) {
+  const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  const events = ['школа', 'прогулка', 'дела', 'встреча', 'пятница', 'выходной', 'спокойный день'];
+  return days.map((day, index) => ({
+    day,
+    event: events[index],
+    title: index % 2 === 0 ? `${form.itemType} + ${palette[index % palette.length].name}` : `${form.mood} база`,
+  }));
+}
+
 function buildRemakePrompt(
   form: OutfitForm,
   palette: PaletteColor[],
@@ -896,11 +954,23 @@ export function OutfitGenerator({
   const autoTodayStartedRef = useRef(false);
 
   const palette = useMemo(() => buildPalette(form), [form]);
-  const brands = useMemo(() => getBrands(form), [form]);
+  const brands = useMemo(() => {
+    const preferred = profilePreferences?.preferred_brands ?? [];
+    const preferredSuggestions = preferred.map((name) => ({ name, reason: 'любимый бренд из профиля' }));
+    const base = getBrands(form).filter((brand) => !preferred.includes(brand.name));
+    return [...preferredSuggestions, ...base].slice(0, 4);
+  }, [form, profilePreferences]);
   const catalogItems = useMemo(() => getCatalogItems(form, palette), [form, palette]);
   const recommendedProducts = useMemo(() => getRecommendedBrandProducts(brandProducts, form, palette), [brandProducts, form, palette]);
   const outfitScores = useMemo(() => getOutfitScores(form, weatherInfo), [form, weatherInfo]);
   const modeDetailTabs = autoToday ? todayDetailTabs : generatorDetailTabs;
+  const visibleItemTypeOptions = useMemo(
+    () => withoutDresses(itemTypeOptions, profilePreferences?.avoid_dresses),
+    [profilePreferences?.avoid_dresses],
+  );
+  const wardrobeAudit = useMemo(() => buildWardrobeAudit(wardrobeItems), [wardrobeItems]);
+  const weekCalendar = useMemo(() => buildWeekCalendar(form, palette), [form, palette]);
+  const dailyTip = useMemo(() => buildDailyTip(form, weatherInfo, profilePreferences), [form, weatherInfo, profilePreferences]);
   const activeWardrobeItem = useMemo(
     () => wardrobeItems.find((item) => item.id === form.wardrobeItemId) ?? null,
     [form.wardrobeItemId, wardrobeItems],
@@ -911,16 +981,31 @@ export function OutfitGenerator({
   }, [userId]);
 
   useEffect(() => {
+    if (!profilePreferences?.avoid_dresses || form.itemType !== 'платье') return;
+    setForm((current) => ({ ...current, itemType: 'жакет' }));
+  }, [form.itemType, profilePreferences?.avoid_dresses]);
+
+  useEffect(() => {
     async function loadProfilePreferences() {
       setProfileLoading(true);
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
-        .select('city, favorite_style, budget, favorite_colors')
+        .select('city, favorite_style, budget, favorite_colors, preferred_brands, avoid_dresses')
         .eq('user_id', userId)
         .maybeSingle<ProfilePreferences>();
 
-      setProfilePreferences(data ?? null);
+      if (error && isMissingProfilePreferenceColumn(error.message)) {
+        const { data: baseData } = await supabase
+          .from('profiles')
+          .select('city, favorite_style, budget, favorite_colors')
+          .eq('user_id', userId)
+          .maybeSingle<ProfilePreferences>();
+
+        setProfilePreferences(baseData ?? null);
+      } else {
+        setProfilePreferences(data ?? null);
+      }
       setProfileLoading(false);
     }
 
@@ -1019,14 +1104,27 @@ export function OutfitGenerator({
 
   function selectWardrobeItem(itemId: string) {
     const item = wardrobeItems.find((wardrobeItem) => wardrobeItem.id === itemId);
+    const nextItemType = profilePreferences?.avoid_dresses && item?.item_type === 'платье' ? 'жакет' : item?.item_type;
     setForm((current) => ({
       ...current,
       wardrobeItemId: itemId,
-      itemType: item?.item_type ?? current.itemType,
+      itemType: nextItemType ?? current.itemType,
       wardrobeColor: item?.color ?? current.wardrobeColor,
       season: item && item.season !== 'всесезон' ? item.season : current.season,
     }));
     setPhotoReady(false);
+  }
+
+  function applyEventOption(option: (typeof eventOptions)[number]) {
+    const nextItemType = profilePreferences?.avoid_dresses && option.itemType === 'платье' ? 'жакет' : option.itemType;
+    setForm((current) => ({
+      ...current,
+      mood: option.mood,
+      place: current.place.trim() ? `${current.place.trim()}, ${option.place}` : option.place,
+      itemType: nextItemType,
+    }));
+    setPhotoReady(false);
+    formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   function generatePhotoReference() {
@@ -1215,7 +1313,10 @@ export function OutfitGenerator({
     const city = profilePreferences?.city.trim() || form.place.trim();
     const season = getCurrentSeason();
     const profileColors = profilePreferences?.favorite_colors ?? [form.wardrobeColor];
-    const wardrobeItem = getTodayWardrobeItem(wardrobeItems, season, profileColors);
+    const usableWardrobeItems = profilePreferences?.avoid_dresses
+      ? wardrobeItems.filter((item) => item.item_type !== 'платье')
+      : wardrobeItems;
+    const wardrobeItem = getTodayWardrobeItem(usableWardrobeItems, season, profileColors);
     const todayForm: OutfitForm = {
       ...form,
       mood: getMoodFromProfileStyle(profilePreferences?.favorite_style ?? form.mood),
@@ -1234,8 +1335,11 @@ export function OutfitGenerator({
     const city = profilePreferences?.city.trim() || form.place.trim();
     const season = getCurrentSeason();
     const profileColors = profilePreferences?.favorite_colors ?? [form.wardrobeColor];
+    const usableWardrobeItems = profilePreferences?.avoid_dresses
+      ? wardrobeItems.filter((item) => item.item_type !== 'платье')
+      : wardrobeItems;
     const wardrobeItem = getTodayWardrobeItem(
-      wardrobeItems.filter((item) => item.item_type === itemType || item.season === season),
+      usableWardrobeItems.filter((item) => item.item_type === itemType || item.season === season),
       season,
       profileColors,
     );
@@ -1247,7 +1351,7 @@ export function OutfitGenerator({
         season,
         budget: budgetOptions.includes(profilePreferences?.budget ?? '') ? profilePreferences?.budget ?? form.budget : form.budget,
         place: city,
-        itemType: wardrobeItem?.item_type ?? itemType,
+        itemType: wardrobeItem?.item_type ?? (profilePreferences?.avoid_dresses && itemType === 'платье' ? 'жакет' : itemType),
         wardrobeColor: wardrobeItem?.color ?? getColorFromProfile(profileColors),
         wardrobeItemId: wardrobeItem?.id ?? '',
       },
@@ -1284,7 +1388,11 @@ export function OutfitGenerator({
       {autoToday && (
       <section className="today-panel" aria-label="Образ на сегодня">
         <div className="panel-copy-with-illustration">
-          <MiniIllustration variant="look" />
+          <div className="editorial-thumb today-style-thumb" aria-hidden="true">
+            <span className="today-style-card" />
+            <span className="today-style-jacket" />
+            <span className="today-style-pearl" />
+          </div>
           <div>
             <h3>Что надеть сегодня</h3>
             <p>
@@ -1374,6 +1482,17 @@ export function OutfitGenerator({
           </select>
         </label>
 
+        <div className="wide event-panel">
+          <p>Подбор по событию</p>
+          <div className="event-options">
+            {eventOptions.map((option) => (
+              <button className="ghost" key={option.label} onClick={() => applyEventOption(option)} type="button">
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <label className="wide">
           Город или событие
           <input
@@ -1398,7 +1517,7 @@ export function OutfitGenerator({
         <label className="wide">
           Какая вещь уже есть
           <select value={form.itemType} onChange={(e) => updateField('itemType', e.target.value)}>
-            {itemTypeOptions.map((option) => (
+            {visibleItemTypeOptions.map((option) => (
               <option key={option}>{option}</option>
             ))}
           </select>
@@ -1450,6 +1569,42 @@ export function OutfitGenerator({
 
       {error && <p className="message">{error}</p>}
 
+      <section className="daily-tip-panel" aria-label="AI-совет дня">
+        <img className="toolbar-photo daily-tip-photo" src="/daily-tip-fashion-books.jpeg" alt="Книги о моде и брендах" />
+        <div>
+          <h3>Совет дня</h3>
+          <p>{dailyTip}</p>
+        </div>
+      </section>
+
+      <section className="wardrobe-audit-panel" aria-label="Оценка гардероба">
+        <div>
+          <h3>Оценка гардероба</h3>
+          <p>{wardrobeItems.length} вещей в базе. Чем больше реальных вещей, тем точнее подбор.</p>
+        </div>
+        <div className="audit-list">
+          {(wardrobeAudit.length > 0 ? wardrobeAudit : ['Гардероб выглядит сбалансированно: можно собирать образы по событию и погоде.']).map((item) => (
+            <span key={item}>{item}</span>
+          ))}
+        </div>
+      </section>
+
+      <section className="week-calendar-panel" aria-label="Календарь образов">
+        <div>
+          <h3>Календарь образов</h3>
+          <p>Быстрый план недели из текущего настроения, сезона и палитры.</p>
+        </div>
+        <div className="week-calendar-grid">
+          {weekCalendar.map((item) => (
+            <article key={item.day}>
+              <span>{item.day}</span>
+              <strong>{item.title}</strong>
+              <small>{item.event}</small>
+            </article>
+          ))}
+        </div>
+      </section>
+
       {recentOutfits.length > 0 && (
         <section className="recent-outfits-panel" aria-label="Последние генерации">
           <div className="panel-copy-with-illustration">
@@ -1476,11 +1631,7 @@ export function OutfitGenerator({
       <article className="result-panel featured-result" ref={resultRef}>
         <div className="result-head">
           <div className="panel-copy-with-illustration">
-            <div className="editorial-thumb result-thumb" aria-hidden="true">
-              <span className="result-page" />
-              <span className="result-look-line" />
-              <span className="result-seal" />
-            </div>
+            <img className="toolbar-photo result-head-photo" src="/generator-ready-look-skateboards.jpeg" alt="Fashion-иллюстрация для готового образа" />
             <h3>Готовый образ</h3>
           </div>
           <button type="button" onClick={saveCurrentOutfit}>
@@ -1505,6 +1656,20 @@ export function OutfitGenerator({
           selectedProduct={selectedProduct}
           wardrobeColor={form.wardrobeColor}
         />
+        <div className="outfit-visual-card" aria-label="Визуальная карточка образа">
+          <div className="outfit-visual-look">
+            <span className="visual-top" style={{ backgroundColor: palette[0].hex }} />
+            <span className="visual-layer" style={{ backgroundColor: palette[1].hex }} />
+            <span className="visual-bottom" style={{ backgroundColor: palette[2].hex }} />
+            <span className="visual-shoes" style={{ backgroundColor: palette[3].hex }} />
+            <span className="visual-bag" style={{ backgroundColor: palette[4].hex }} />
+          </div>
+          <div>
+            <span>{form.mood}</span>
+            <strong>{form.itemType} · {form.wardrobeColor}</strong>
+            <small>{form.season} · {form.budget}</small>
+          </div>
+        </div>
         <p>{result}</p>
       </article>
 

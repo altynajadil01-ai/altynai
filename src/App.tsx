@@ -94,6 +94,7 @@ export default function App() {
     <main className="container">
       <header className="header">
         <div className="brand">
+          <img className="logo-image" src="/stylelab-logo-tag.jpeg" alt="StyleLab logo" />
           <div>
             <h1>StyleLab</h1>
             <p>outfit generator</p>

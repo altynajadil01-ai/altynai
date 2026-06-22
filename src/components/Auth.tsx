@@ -97,6 +97,12 @@ export function Auth() {
 
   return (
     <section className="auth-screen" aria-label="Вход в StyleLab">
+      <aside className="auth-side-panel auth-side-panel-left" aria-label="StyleLab notes">
+        <span className="auth-side-label">STYLE NOTES</span>
+        <strong>01</strong>
+        <p>Гардероб, идеи и сохраненные образы в одном месте.</p>
+      </aside>
+
       <div className="auth-hero">
         <div className="auth-kicker">StyleLab</div>
         <h2>Собирай образы быстрее и увереннее</h2>
@@ -159,6 +165,12 @@ export function Auth() {
           {mode === 'signin' ? 'Нет аккаунта? Зарегистрируйся' : 'Уже есть аккаунт? Войти'}
         </button>
       </div>
+
+      <aside className="auth-side-panel auth-side-panel-right" aria-label="StyleLab archive">
+        <span className="auth-side-label">LOOK ARCHIVE</span>
+        <strong>24/7</strong>
+        <p>Подборки под настроение, погоду и вещи из твоего шкафа.</p>
+      </aside>
     </section>
   );
 }

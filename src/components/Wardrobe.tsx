@@ -45,11 +45,11 @@ const colors = [
   'зеленый',
   'голубой',
   'синий',
-  'фиолетовый',
+  'золотой',
   'розовый',
   'холодный мятный',
   'серый шалфей',
-  'ледяной сиреневый',
+  'светло-золотой',
   'чернильный',
   'стальной синий',
 ];
@@ -317,11 +317,7 @@ export function Wardrobe({ userId, onUseItem }: { userId: string; onUseItem: (it
 
       <div className="wardrobe-toolbar">
         <div className="toolbar-title">
-          <div className="editorial-thumb wardrobe-count-thumb compact-thumb" aria-hidden="true">
-            <span className="wardrobe-rail" />
-            <span className="wardrobe-jacket" />
-            <span className="wardrobe-hanger" />
-          </div>
+          <img className="toolbar-photo wardrobe-count-photo" src="/wardrobe-count-shoes.jpeg" alt="Fashion-иллюстрация туфель" />
           <strong>{items.length} вещей</strong>
         </div>
         <div className="wardrobe-stats" aria-label="Статистика гардероба">

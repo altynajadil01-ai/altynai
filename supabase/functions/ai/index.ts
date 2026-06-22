@@ -1,15 +1,24 @@
-// AI-функция на бесплатном ключе Google Gemini.
+// AI-функция на Google Gemini.
 // Вызов с фронта: supabase.functions.invoke('ai', { body: { prompt, system } })
-//
-// Запуск (один раз):
-//   1) Возьми бесплатный ключ: https://aistudio.google.com/apikey
-//   2) Положи его в секрет:  npm run ai:secret -- GEMINI_API_KEY=твой_ключ
-//   3) Задеплой функцию:     npm run ai:deploy
-//
-// Модель можно поменять (gemini-2.0-flash — быстрая и бесплатная).
+
+type GeminiError = {
+  error?: {
+    message?: string;
+  };
+};
+
+type GeminiResponse = GeminiError & {
+  candidates?: Array<{
+    content?: {
+      parts?: Array<{
+        text?: string;
+      }>;
+    };
+  }>;
+};
 
 const GEMINI_API_KEY = Deno.env.get('GEMINI_API_KEY');
-const MODEL = 'gemini-2.0-flash';
+const MODEL = 'gemini-2.5-flash-lite';
 
 const cors = {
   'Access-Control-Allow-Origin': '*',
@@ -23,6 +32,7 @@ Deno.serve(async (req) => {
     if (!GEMINI_API_KEY) {
       throw new Error('Нет GEMINI_API_KEY. Поставь секрет: npm run ai:secret -- GEMINI_API_KEY=...');
     }
+
     const { prompt, system } = await req.json();
     if (!prompt) throw new Error('Нужно поле prompt');
 
@@ -38,13 +48,13 @@ Deno.serve(async (req) => {
       },
     );
 
-    const data = await res.json();
+    const data = (await res.json()) as GeminiResponse;
     if (!res.ok) {
-      const message = data?.error?.message ?? `Gemini request failed with status ${res.status}`;
+      const message = data.error?.message ?? `Gemini request failed with status ${res.status}`;
       throw new Error(message);
     }
 
-    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
     if (!text.trim()) {
       throw new Error('Gemini вернул пустой ответ. Проверьте GEMINI_API_KEY и доступ модели.');
     }
