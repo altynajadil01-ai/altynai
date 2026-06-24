@@ -553,7 +553,7 @@
           </div>
         </div>
         <div class="qr-card">
-          <img id="qrCode" src="" alt="QR code на приложение StyleLab" />
+          <img src="/stylelab-qr.png" alt="QR code на приложение StyleLab" />
           <p class="site-link" id="siteLink"></p>
         </div>
         <span class="slide-number">05</span>
@@ -570,11 +570,9 @@
       const appUrl = "https://altynai-tau.vercel.app/";
       const slides = Array.from(document.querySelectorAll(".slide"));
       const progress = document.getElementById("progress");
-      const qrCode = document.getElementById("qrCode");
       const siteLink = document.getElementById("siteLink");
       let current = 0;
 
-      qrCode.src = `https://api.qrserver.com/v1/create-qr-code/?size=360x360&data=${encodeURIComponent(appUrl)}`;
       siteLink.textContent = appUrl;
 
       slides.forEach((_, index) => {
