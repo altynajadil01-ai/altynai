@@ -114,7 +114,7 @@ export function Auth() {
         <div className="auth-kicker">StyleLab</div>
         <h2>Собирай образы быстрее и увереннее</h2>
         <p>Личный гардероб, AI-подборки, сохраненные образы и идеи для недели в одном аккуратном месте.</p>
-        <img className="auth-hero-photo" src="/auth-vogue-stack.jpg" alt="Черно-белые fashion журналы" />
+        <img className="auth-hero-photo" src="/auth-vogue-covers.jpeg" alt="Обложки Vogue" />
         <div className="auth-feature-row" aria-label="Возможности приложения">
           <span>AI образы</span>
           <span>Гардероб</span>

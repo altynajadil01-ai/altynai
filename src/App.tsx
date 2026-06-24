@@ -7,9 +7,10 @@ import { Onboarding } from './components/Onboarding';
 import { OutfitGenerator } from './components/OutfitGenerator';
 import { Profile } from './components/Profile';
 import { SavedOutfits } from './components/SavedOutfits';
+import { TheStylist } from './components/TheStylist';
 import { Wardrobe } from './components/Wardrobe';
 
-type AppPage = 'today' | 'generator' | 'wardrobe' | 'brands' | 'profile' | 'collection';
+type AppPage = 'stylist' | 'generator' | 'wardrobe' | 'brands' | 'profile' | 'collection';
 
 export type WardrobePick = {
   id: string;
@@ -42,7 +43,7 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [profileChecking, setProfileChecking] = useState(false);
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
-  const [page, setPage] = useState<AppPage>('today');
+  const [page, setPage] = useState<AppPage>('stylist');
   const [selectedProduct, setSelectedProduct] = useState<BrandProduct | null>(null);
   const [selectedWardrobeItem, setSelectedWardrobeItem] = useState<WardrobePick | null>(null);
 
@@ -61,7 +62,7 @@ export default function App() {
         void ensureProfile(nextSession.user.id, nextSession.user.email ?? '');
       }
       if (!nextSession) {
-        setPage('today');
+        setPage('stylist');
         setNeedsOnboarding(false);
       }
     });
@@ -119,8 +120,8 @@ export default function App() {
         {session && (
           <div className="header-actions">
             <nav className="tabs" aria-label="Разделы приложения">
-              <button className={page === 'today' ? 'active' : ''} onClick={() => setPage('today')} type="button">
-                Сегодня
+              <button className={page === 'stylist' ? 'active' : ''} onClick={() => setPage('stylist')} type="button">
+                Стилист
               </button>
               <button className={page === 'generator' ? 'active' : ''} onClick={() => setPage('generator')} type="button">
                 Генератор
@@ -149,6 +150,8 @@ export default function App() {
 
       {!session ? (
         <Auth />
+      ) : page === 'stylist' ? (
+        <TheStylist />
       ) : page === 'wardrobe' ? (
         <Wardrobe
           userId={session.user.id}
@@ -172,7 +175,8 @@ export default function App() {
         <SavedOutfits userId={session.user.id} />
       ) : (
         <OutfitGenerator
-          autoToday={page === 'today'}
+          autoToday={false}
+          onOutfitSaved={() => setPage('collection')}
           selectedWardrobeItem={selectedWardrobeItem}
           selectedProduct={selectedProduct}
           userId={session.user.id}

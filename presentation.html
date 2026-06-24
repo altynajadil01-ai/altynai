@@ -1,0 +1,766 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>StyleLab Presentation</title>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Great+Vibes&family=Inter+Tight:wght@400;500;600;700;800;900&family=Playfair+Display:wght@600;700&display=swap');
+
+      :root {
+        --bg: #ffffff;
+        --paper: #fffaf1;
+        --ink: #202020;
+        --muted: #5d5a55;
+        --line: rgba(32, 32, 32, 0.12);
+        --pink: #f8cdda;
+        --rose: #df7ea6;
+        --rose-deep: #ce5f90;
+        --soft: #fff4f7;
+        --font-body: 'Inter Tight', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        --font-display: 'Bebas Neue', Impact, 'Arial Narrow', sans-serif;
+        --font-script: 'Great Vibes', 'Times New Roman', cursive;
+        --font-logo: 'Playfair Display', Georgia, 'Times New Roman', serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        min-height: 100vh;
+        overflow: hidden;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--font-body);
+      }
+
+      .deck {
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 34px;
+      }
+
+      .slide {
+        position: absolute;
+        display: grid;
+        width: min(1120px, calc(100vw - 68px));
+        min-height: min(650px, calc(100vh - 104px));
+        overflow: hidden;
+        padding: 56px 64px 72px;
+        background:
+          linear-gradient(112deg, transparent 0 48%, rgba(248, 205, 218, 0.88) 48.2% 100%),
+          linear-gradient(102deg, transparent 0 23%, rgba(223, 126, 166, 0.9) 23.2% 31%, transparent 31.2% 100%),
+          linear-gradient(102deg, transparent 0 16%, rgba(248, 205, 218, 0.88) 16.2% 21%, transparent 21.2% 100%),
+          var(--paper);
+        border: 0;
+        border-radius: 0;
+        box-shadow: 0 18px 34px rgba(57, 52, 37, 0.34);
+        opacity: 0;
+        pointer-events: none;
+        transform: translateX(34px) scale(0.985);
+        transition:
+          opacity 520ms ease,
+          transform 620ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+
+      .slide.active {
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(0) scale(1);
+        z-index: 2;
+      }
+
+      .slide.exiting {
+        opacity: 0;
+        transform: translateX(-34px) scale(0.985);
+      }
+
+      .slide::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 260px;
+        height: 230px;
+        background-image: radial-gradient(circle, rgba(248, 205, 218, 0.95) 0 9px, transparent 10px);
+        background-size: 34px 34px;
+        opacity: 0.9;
+        pointer-events: none;
+      }
+
+      .slide::after {
+        content: "";
+        position: absolute;
+        right: -78px;
+        bottom: -80px;
+        width: 300px;
+        height: 230px;
+        border-radius: 999px 0 0 0;
+        background:
+          radial-gradient(circle at 34% 36%, transparent 0 54px, rgba(248, 205, 218, 0.9) 55px 100px, transparent 101px),
+          radial-gradient(circle, rgba(223, 126, 166, 0.24) 0 3px, transparent 4px);
+        background-size: auto, 18px 18px;
+        pointer-events: none;
+      }
+
+      h1,
+      h2 {
+        color: var(--ink);
+        font-family: var(--font-display);
+        font-weight: 400;
+        letter-spacing: 0.01em;
+        line-height: 0.9;
+        text-transform: uppercase;
+        transform: none;
+        transform-origin: left center;
+      }
+
+      h1 {
+        font-size: clamp(76px, 9vw, 128px);
+      }
+
+      .name-title {
+        color: #202020;
+        font-family: 'Playfair Display', Georgia, 'Times New Roman', serif !important;
+        font-size: clamp(56px, 7vw, 96px);
+        font-weight: 700;
+        font-style: italic;
+        letter-spacing: 0;
+        line-height: 0.95;
+        transform: none;
+      }
+
+      h2 {
+        font-size: clamp(62px, 7vw, 104px);
+      }
+
+      p {
+        color: var(--muted);
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 1.42;
+      }
+
+      img {
+        display: block;
+      }
+
+      .animate {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      .slide.active .animate {
+        animation: rise 720ms cubic-bezier(0.18, 0.8, 0.2, 1) forwards;
+      }
+
+      .delay-1 {
+        animation-delay: 90ms !important;
+      }
+
+      .delay-2 {
+        animation-delay: 180ms !important;
+      }
+
+      .delay-3 {
+        animation-delay: 270ms !important;
+      }
+
+      .delay-4 {
+        animation-delay: 360ms !important;
+      }
+
+      @keyframes rise {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        width: fit-content;
+        padding: 7px 13px;
+        background: rgba(255, 250, 241, 0.86);
+        border: 0;
+        box-shadow: inset 0 0 0 1px rgba(32, 32, 32, 0.08);
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .slide-number {
+        position: absolute;
+        left: 28px;
+        bottom: 20px;
+        z-index: 2;
+        color: rgba(32, 32, 32, 0.34);
+        font-family: var(--font-display);
+        font-size: 44px;
+        line-height: 1;
+      }
+
+      .two-col,
+      .demo-slide,
+      .qr-slide {
+        grid-template-columns: minmax(0, 1fr) minmax(320px, 0.82fr);
+        gap: 42px;
+        align-items: center;
+      }
+
+      .copy {
+        z-index: 1;
+        display: grid;
+        gap: 18px;
+        min-width: 0;
+      }
+
+      .statement {
+        max-width: 700px;
+        padding: 18px 20px;
+        background: rgba(255, 250, 241, 0.9);
+        border: 0;
+        border-left: 10px solid var(--rose);
+        box-shadow: 0 10px 18px rgba(57, 52, 37, 0.12);
+        color: #222;
+        font-size: 18px;
+      }
+
+      .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .meta-row span,
+      .chip {
+        padding: 8px 10px;
+        background: rgba(255, 250, 241, 0.92);
+        border: 0;
+        box-shadow: inset 0 0 0 1px rgba(32, 32, 32, 0.08);
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .image-frame,
+      .screenshot,
+      .mini-card,
+      .qr-card,
+      .video-frame {
+        z-index: 1;
+        background: var(--paper);
+        border: 0;
+        box-shadow: 0 14px 24px rgba(57, 52, 37, 0.22);
+      }
+
+      .image-frame {
+        display: grid;
+        gap: 14px;
+        padding: 14px;
+      }
+
+      .image-frame img,
+      .screenshot img,
+      .mini-card img {
+        width: 100%;
+        border: 0;
+        outline: 8px solid #fff7f8;
+        box-shadow: 10px 10px 0 rgba(223, 126, 166, 0.38);
+        object-fit: cover;
+      }
+
+      .image-frame img {
+        height: 410px;
+      }
+
+      .image-caption {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .point-list {
+        display: grid;
+        gap: 10px;
+        list-style: none;
+      }
+
+      .point-list li {
+        display: grid;
+        grid-template-columns: 38px 1fr;
+        gap: 12px;
+        align-items: start;
+        padding: 14px;
+        background: rgba(255, 250, 241, 0.93);
+        border: 0;
+        box-shadow: 0 10px 18px rgba(57, 52, 37, 0.11);
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.32;
+      }
+
+      .point-list span {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        background: var(--rose);
+        border: 0;
+        color: var(--ink);
+        font-family: var(--font-display);
+        font-size: 20px;
+      }
+
+      .point-list strong {
+        display: block;
+        margin-bottom: 4px;
+        color: var(--ink);
+        font-family: var(--font-display);
+        font-size: 24px;
+        font-weight: 400;
+        line-height: 0.9;
+        text-transform: uppercase;
+      }
+
+      .screens-slide {
+        grid-template-rows: auto 1fr;
+        gap: 24px;
+      }
+
+      .screens-head {
+        z-index: 1;
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: end;
+      }
+
+      .screens-head p {
+        max-width: 430px;
+      }
+
+      .screens-grid {
+        z-index: 1;
+        display: grid;
+        grid-template-columns: 1.35fr 0.9fr;
+        gap: 18px;
+      }
+
+      .screenshot,
+      .mini-card {
+        padding: 14px;
+      }
+
+      .screenshot img {
+        height: 450px;
+        object-position: top center;
+      }
+
+      .mini-stack {
+        display: grid;
+        gap: 18px;
+      }
+
+      .mini-card img {
+        height: 140px;
+      }
+
+      .mini-card strong,
+      .screenshot strong {
+        display: block;
+        margin: 14px 0 6px;
+        color: var(--ink);
+        font-family: var(--font-display);
+        font-size: 30px;
+        font-weight: 400;
+        line-height: 0.9;
+        text-transform: uppercase;
+      }
+
+      .mini-card p,
+      .screenshot p {
+        font-size: 14px;
+      }
+
+      .video-frame {
+        position: relative;
+        aspect-ratio: 16 / 9;
+        overflow: hidden;
+        background: var(--rose);
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .video-placeholder {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-content: center;
+        gap: 10px;
+        padding: 38px;
+        background:
+          radial-gradient(circle at 10% 18%, rgba(255, 250, 241, 0.46) 0 70px, transparent 71px),
+          linear-gradient(115deg, rgba(255, 250, 241, 0.92) 0 46%, rgba(248, 205, 218, 0.95) 46.2% 100%);
+        color: var(--ink);
+        text-align: center;
+      }
+
+      .video-placeholder strong {
+        color: var(--ink);
+        font-family: var(--font-display);
+        font-size: 62px;
+        font-weight: 400;
+        line-height: 0.9;
+        text-transform: uppercase;
+      }
+
+      .video-placeholder p {
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 900;
+        text-transform: uppercase;
+      }
+
+      .cta {
+        max-width: 760px;
+        color: var(--ink);
+        font-family: var(--font-display);
+        font-size: clamp(46px, 6vw, 78px);
+        line-height: 0.95;
+        text-transform: uppercase;
+        transform: none;
+        transform-origin: left center;
+      }
+
+      .qr-card {
+        display: grid;
+        gap: 18px;
+        justify-items: center;
+        padding: 28px;
+      }
+
+      .qr-card img {
+        width: min(330px, 100%);
+        padding: 14px;
+        background: #fff;
+        border: 0;
+        box-shadow: inset 0 0 0 1px rgba(32, 32, 32, 0.08);
+      }
+
+      .site-link {
+        color: var(--ink);
+        font-size: 12px;
+        font-weight: 900;
+        text-align: center;
+        text-transform: uppercase;
+      }
+
+      .controls {
+        position: fixed;
+        left: 50%;
+        bottom: 18px;
+        z-index: 8;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transform: translateX(-50%);
+      }
+
+      button {
+        min-height: 42px;
+        padding: 10px 14px;
+        background: var(--paper);
+        border: 0;
+        box-shadow: 0 8px 16px rgba(57, 52, 37, 0.2);
+        color: var(--ink);
+        font-family: var(--font-body);
+        font-size: 12px;
+        font-weight: 900;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: var(--rose);
+        color: #fff;
+      }
+
+      .progress {
+        display: flex;
+        gap: 6px;
+        padding: 10px 12px;
+        background: var(--paper);
+        border: 0;
+        box-shadow: 0 8px 16px rgba(57, 52, 37, 0.2);
+      }
+
+      .dot {
+        width: 26px;
+        height: 4px;
+        background: #d7d7d7;
+        transition: background 260ms ease, width 260ms ease;
+      }
+
+      .dot.active {
+        width: 42px;
+        background: var(--rose);
+        border: 0;
+      }
+
+      @media (max-width: 820px) {
+        body {
+          overflow: auto;
+        }
+
+        .deck {
+          padding: 12px;
+        }
+
+        .slide {
+          width: calc(100vw - 24px);
+          min-height: calc(100vh - 74px);
+          padding: 44px 22px 76px;
+        }
+
+        .two-col,
+        .screens-grid,
+        .demo-slide,
+        .qr-slide {
+          grid-template-columns: 1fr;
+        }
+
+        .screens-head {
+          display: grid;
+        }
+
+        h1,
+        h2,
+        .cta {
+          transform: none;
+        }
+
+        .image-frame img,
+        .screenshot img {
+          height: 300px;
+        }
+
+        .controls {
+          bottom: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="deck">
+      <section class="slide two-col active" aria-label="Slide 1">
+        <div class="copy">
+          <span class="eyebrow animate">Slide 1</span>
+          <h1 class="name-title animate delay-1">Алтынай Адиль</h1>
+          <p class="statement animate delay-2">
+            Маленький факт обо мне: мне нравится мода, визуальный стиль и то, как один образ может
+            менять настроение на весь день.
+          </p>
+          <div class="meta-row animate delay-3">
+            <span>nFactorial Teens</span>
+            <span>Fashion tech</span>
+            <span>AI styling</span>
+          </div>
+        </div>
+        <div class="image-frame animate delay-2">
+          <img src="public/first-slide-miu-miu-bag.jpeg" alt="Pink Miu Miu bag" />
+          <div class="image-caption">
+            <span>Pink mood</span>
+            <span>StyleLab</span>
+          </div>
+        </div>
+        <span class="slide-number">01</span>
+      </section>
+
+      <section class="slide two-col" aria-label="Slide 2">
+        <div class="copy">
+          <span class="eyebrow animate">Slide 2</span>
+          <h2 class="animate delay-1">StyleLab</h2>
+          <p class="statement animate delay-2">
+            StyleLab - это веб-приложение, которое помогает подобрать стильный образ по погоде,
+            настроению, гардеробу и любимому fashion-направлению.
+          </p>
+        </div>
+        <div class="copy animate delay-3">
+          <ul class="point-list">
+            <li>
+              <span>1</span>
+              <div><strong>Проблема</strong>Выбор одежды часто занимает время и не всегда совпадает с настроением.</div>
+            </li>
+            <li>
+              <span>2</span>
+              <div><strong>Решение</strong>Пользователь задает параметры, а приложение предлагает готовый образ.</div>
+            </li>
+            <li>
+              <span>3</span>
+              <div><strong>Ценность</strong>Образы, гардероб и идеи сохраняются в одном аккуратном пространстве.</div>
+            </li>
+            <li>
+              <span>4</span>
+              <div><strong>AI</strong>Искусственный интеллект помогает создавать персональные style-рекомендации.</div>
+            </li>
+          </ul>
+        </div>
+        <span class="slide-number">02</span>
+      </section>
+
+      <section class="slide screens-slide" aria-label="Slide 3">
+        <div class="screens-head">
+          <div>
+            <span class="eyebrow animate">Slide 3</span>
+            <h2 class="animate delay-1">Скриншоты</h2>
+          </div>
+          <p class="animate delay-2">
+            Основные экраны StyleLab: генератор образов, гардероб, бренды, профиль и коллекция
+            сохраненных look'ов.
+          </p>
+        </div>
+        <div class="screens-grid animate delay-3">
+          <div class="screenshot">
+            <img src="public/presentation-app-screen.png" alt="Скриншот StyleLab" />
+            <strong>Главный экран</strong>
+            <p>Личный fashion-кабинет, где пользователь может создавать и сохранять образы.</p>
+          </div>
+          <div class="mini-stack">
+            <div class="mini-card">
+              <img src="public/generator-ready-look-clothes-rack.jpeg" alt="Генератор образов" />
+              <strong>Generator</strong>
+              <p>Подбор образа по параметрам и настроению.</p>
+            </div>
+            <div class="mini-card">
+              <img src="public/wardrobe-closet.jpg" alt="Гардероб" />
+              <strong>Wardrobe</strong>
+              <p>Персональный гардероб для более точного результата.</p>
+            </div>
+            <div class="mini-card">
+              <img src="public/collection-flower-girls.jpeg" alt="Коллекция" />
+              <strong>Collection</strong>
+              <p>Сохраненные образы, к которым можно вернуться позже.</p>
+            </div>
+          </div>
+        </div>
+        <span class="slide-number">03</span>
+      </section>
+
+      <section class="slide demo-slide" aria-label="Slide 4">
+        <div class="video-frame animate delay-1">
+          <video id="demoVideo" src="public/demo.mp4" controls poster="public/presentation-app-screen.png"></video>
+          <div class="video-placeholder" id="videoPlaceholder">
+            <strong>Video demo</strong>
+            <p>Запиши демо и назови файл public/demo.mp4</p>
+          </div>
+        </div>
+        <div class="copy">
+          <span class="eyebrow animate">Slide 4</span>
+          <h2 class="animate delay-1">Демо</h2>
+          <ul class="point-list animate delay-2">
+            <li>
+              <span>1</span>
+              <div><strong>Вход</strong>Показать личный аккаунт пользователя.</div>
+            </li>
+            <li>
+              <span>2</span>
+              <div><strong>Подбор</strong>Выбрать настроение, сезон, вещь и запустить генерацию.</div>
+            </li>
+            <li>
+              <span>3</span>
+              <div><strong>Сохранение</strong>Сохранить образ и перейти в коллекцию.</div>
+            </li>
+            <li>
+              <span>4</span>
+              <div><strong>Результат</strong>Показать, что look остался в сохраненных.</div>
+            </li>
+          </ul>
+        </div>
+        <span class="slide-number">04</span>
+      </section>
+
+      <section class="slide qr-slide" aria-label="Slide 5">
+        <div class="copy">
+          <span class="eyebrow animate">Slide 5</span>
+          <h2 class="animate delay-1">Try StyleLab</h2>
+          <p class="cta animate delay-2">Собирайте образы увереннее, быстрее и эстетичнее.</p>
+          <div class="meta-row animate delay-3">
+            <span>AI stylist</span>
+            <span>Saved looks</span>
+            <span>Personal wardrobe</span>
+          </div>
+        </div>
+        <div class="qr-card animate delay-2">
+          <img src="public/presentation-qr.png" alt="QR code на StyleLab" />
+          <p class="site-link">http://192.168.0.109:5173/</p>
+        </div>
+        <span class="slide-number">05</span>
+      </section>
+    </main>
+
+    <div class="controls" aria-label="Presentation controls">
+      <button type="button" id="prev">Назад</button>
+      <div class="progress" id="progress" aria-label="Slide progress"></div>
+      <button type="button" id="next">Дальше</button>
+    </div>
+
+    <script>
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const progress = document.getElementById("progress");
+      let current = 0;
+
+      slides.forEach((_, index) => {
+        const dot = document.createElement("span");
+        dot.className = index === 0 ? "dot active" : "dot";
+        progress.appendChild(dot);
+      });
+
+      const dots = Array.from(document.querySelectorAll(".dot"));
+
+      function showSlide(index) {
+        const previous = current;
+        current = (index + slides.length) % slides.length;
+
+        slides[previous].classList.add("exiting");
+        slides[previous].classList.remove("active");
+
+        slides[current].classList.remove("exiting");
+        slides[current].classList.add("active");
+
+        dots.forEach((dot, dotIndex) => {
+          dot.classList.toggle("active", dotIndex === current);
+        });
+
+        window.setTimeout(() => slides[previous].classList.remove("exiting"), 650);
+      }
+
+      document.getElementById("prev").addEventListener("click", () => showSlide(current - 1));
+      document.getElementById("next").addEventListener("click", () => showSlide(current + 1));
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowRight" || event.key === " ") showSlide(current + 1);
+        if (event.key === "ArrowLeft") showSlide(current - 1);
+      });
+
+      const demoVideo = document.getElementById("demoVideo");
+      const videoPlaceholder = document.getElementById("videoPlaceholder");
+      demoVideo.addEventListener("loadeddata", () => {
+        videoPlaceholder.style.display = "none";
+      });
+    </script>
+  </body>
+</html>

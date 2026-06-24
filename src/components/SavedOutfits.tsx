@@ -28,6 +28,38 @@ const emptyFilter: CollectionFilter = {
   favoritesOnly: false,
 };
 
+const allSeasons = ['всесезон', 'весна', 'лето', 'осень', 'зима'];
+const allStyles = ['спокойное', 'элегантное', 'уличное', 'романтичное', 'деловое', 'спортивное', 'минималистичное', 'уютное', 'дерзкое', 'праздничное', 'винтажное'];
+const allColors = [
+  'черный',
+  'белый',
+  'серый',
+  'светло-серый',
+  'графитовый',
+  'бежевый',
+  'молочный',
+  'коричневый',
+  'хаки',
+  'синий деним',
+  'темно-синий',
+  'бордовый',
+  'сливовый',
+  'винный',
+  'красный',
+  'оранжевый',
+  'желтый',
+  'зеленый',
+  'голубой',
+  'синий',
+  'пудрово-розовый',
+  'розовый',
+  'холодный мятный',
+  'серый шалфей',
+  'нежно-розовый',
+  'чернильный',
+  'стальной синий',
+];
+
 function uniqueValues(items: SavedOutfit[], field: keyof Pick<SavedOutfit, 'season' | 'mood' | 'wardrobe_color'>) {
   return Array.from(new Set(items.map((item) => item[field]).filter(Boolean))).sort();
 }
@@ -76,9 +108,9 @@ export function SavedOutfits({ userId }: { userId: string }) {
     loadSavedOutfits();
   }, [userId]);
 
-  const seasons = useMemo(() => uniqueValues(items, 'season'), [items]);
-  const moods = useMemo(() => uniqueValues(items, 'mood'), [items]);
-  const colors = useMemo(() => uniqueValues(items, 'wardrobe_color'), [items]);
+  const seasons = useMemo(() => Array.from(new Set([...allSeasons, ...uniqueValues(items, 'season')])), [items]);
+  const moods = useMemo(() => Array.from(new Set([...allStyles, ...uniqueValues(items, 'mood')])), [items]);
+  const colors = useMemo(() => Array.from(new Set([...allColors, ...uniqueValues(items, 'wardrobe_color')])), [items]);
   const favoriteCount = useMemo(() => items.filter((item) => item.is_favorite).length, [items]);
   const activeFilterCount = useMemo(
     () =>
@@ -132,7 +164,7 @@ export function SavedOutfits({ userId }: { userId: string }) {
           </h2>
           <p>Фильтруй лучшие идеи по сезону, настроению и цвету, отмечай избранное и быстро возвращайся к удачным сочетаниям.</p>
         </div>
-        <img className="today-hero-photo" src="/profile-sketches.jpg" alt="Fashion-эскизы для сохраненных образов" />
+        <img className="today-hero-photo" src="/collection-flower-girls.jpeg" alt="Fashion-образы с цветами для коллекции" />
       </div>
 
       <div className="collection-filters">

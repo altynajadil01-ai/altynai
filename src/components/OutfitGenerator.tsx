@@ -418,24 +418,64 @@ function getWeatherDescription(code: number) {
   return 'погода без сильных особенностей';
 }
 
+const nonCityPlaceWords = ['школа', 'городская прогулка', 'свидание', 'день рождения', 'ресторан', 'поездка'];
+
+const weatherCityAliases: Record<string, string[]> = {
+  алматы: ['Алматы', 'Almaty'],
+  астана: ['Астана', 'Astana'],
+  'нур-султан': ['Астана', 'Astana'],
+  шымкент: ['Шымкент', 'Shymkent'],
+  караганда: ['Караганда', 'Karaganda'],
+  актобе: ['Актобе', 'Aktobe'],
+  тараз: ['Тараз', 'Taraz'],
+  павлодар: ['Павлодар', 'Pavlodar'],
+  'усть-каменогорск': ['Усть-Каменогорск', 'Oskemen'],
+  семей: ['Семей', 'Semey'],
+  атырау: ['Атырау', 'Atyrau'],
+  костанай: ['Костанай', 'Kostanay'],
+  кызылорда: ['Кызылорда', 'Kyzylorda'],
+  актау: ['Актау', 'Aktau'],
+  уральск: ['Уральск', 'Oral'],
+};
+
+function getWeatherSearchPlace(place: string) {
+  const parts = place
+    .split(',')
+    .map((part) => part.trim())
+    .filter(Boolean);
+  const cityPart =
+    parts.find((part) => !nonCityPlaceWords.includes(part.toLowerCase())) ?? parts[0] ?? place.trim();
+
+  return cityPart;
+}
+
+function getWeatherSearchCandidates(place: string) {
+  const city = getWeatherSearchPlace(place);
+  const aliases = weatherCityAliases[city.toLowerCase()] ?? [city];
+  return Array.from(new Set(aliases));
+}
+
 async function fetchWeather(place: string): Promise<WeatherInfo | null> {
+  const candidates = getWeatherSearchCandidates(place);
+
+  for (const candidate of candidates) {
   const geocodingUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(
-    place,
+    candidate,
   )}&count=1&language=ru&format=json`;
   const geocodingResponse = await fetch(geocodingUrl);
-  if (!geocodingResponse.ok) return null;
+  if (!geocodingResponse.ok) continue;
 
   const geocodingData = (await geocodingResponse.json()) as GeocodingResponse;
   const city = geocodingData.results?.[0];
-  if (!city) return null;
+  if (!city) continue;
 
   const forecastUrl = `https://api.open-meteo.com/v1/forecast?latitude=${city.latitude}&longitude=${city.longitude}&current=temperature_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m`;
   const forecastResponse = await fetch(forecastUrl);
-  if (!forecastResponse.ok) return null;
+  if (!forecastResponse.ok) continue;
 
   const forecastData = (await forecastResponse.json()) as ForecastResponse;
   const current = forecastData.current;
-  if (!current || current.temperature_2m === undefined) return null;
+  if (!current || current.temperature_2m === undefined) continue;
 
   return {
     city: city.name,
@@ -446,6 +486,9 @@ async function fetchWeather(place: string): Promise<WeatherInfo | null> {
     precipitation: current.precipitation ?? 0,
     description: getWeatherDescription(current.weather_code ?? 0),
   };
+  }
+
+  return null;
 }
 
 function getWeatherText(weather: WeatherInfo | null) {
@@ -908,12 +951,14 @@ function getTodayWardrobeItem(items: WardrobeItem[], season: string, colors: str
 
 export function OutfitGenerator({
   autoToday = false,
+  onOutfitSaved,
   selectedWardrobeItem,
   selectedProduct,
   userId,
   userEmail,
 }: {
   autoToday?: boolean;
+  onOutfitSaved?: () => void;
   selectedWardrobeItem: WardrobePick | null;
   selectedProduct: BrandProduct | null;
   userId: string;
@@ -924,7 +969,7 @@ export function OutfitGenerator({
     season: seasonOptions[0],
     gender: genderOptions[2],
     budget: budgetOptions[1],
-    place: '',
+    place: 'Алматы',
     itemType: itemTypeOptions[0],
     wardrobeColor: wardrobeColors[0].name,
     wardrobeItemId: '',
@@ -938,6 +983,7 @@ export function OutfitGenerator({
   const [uploadedPhoto, setUploadedPhoto] = useState<UploadedPhoto | null>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [savingOutfit, setSavingOutfit] = useState(false);
   const [loading, setLoading] = useState(false);
   const [todayLoading, setTodayLoading] = useState(false);
   const [profileLoading, setProfileLoading] = useState(true);
@@ -979,6 +1025,24 @@ export function OutfitGenerator({
   useEffect(() => {
     setRecentOutfits(loadRecentOutfits(userId));
   }, [userId]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    async function loadAlmatyWeather() {
+      setWeatherStatus('Проверяю погоду в Алматы...');
+      const weather = await fetchWeather('Алматы').catch(() => null);
+      if (ignore) return;
+      setWeatherInfo(weather);
+      setWeatherStatus(weather ? getWeatherText(weather) : 'Погоду Алматы сейчас найти не удалось.');
+    }
+
+    loadAlmatyWeather();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!profilePreferences?.avoid_dresses || form.itemType !== 'платье') return;
@@ -1102,19 +1166,6 @@ export function OutfitGenerator({
     }, 80);
   }
 
-  function selectWardrobeItem(itemId: string) {
-    const item = wardrobeItems.find((wardrobeItem) => wardrobeItem.id === itemId);
-    const nextItemType = profilePreferences?.avoid_dresses && item?.item_type === 'платье' ? 'жакет' : item?.item_type;
-    setForm((current) => ({
-      ...current,
-      wardrobeItemId: itemId,
-      itemType: nextItemType ?? current.itemType,
-      wardrobeColor: item?.color ?? current.wardrobeColor,
-      season: item && item.season !== 'всесезон' ? item.season : current.season,
-    }));
-    setPhotoReady(false);
-  }
-
   function applyEventOption(option: (typeof eventOptions)[number]) {
     const nextItemType = profilePreferences?.avoid_dresses && option.itemType === 'платье' ? 'жакет' : option.itemType;
     setForm((current) => ({
@@ -1160,7 +1211,10 @@ export function OutfitGenerator({
   }
 
   async function saveCurrentOutfit() {
+    if (savingOutfit) return;
+
     setSaveMessage('');
+    setSavingOutfit(true);
 
     const title = `${form.itemType} ${form.wardrobeColor} · ${form.mood}`;
     const { error: saveError } = await supabase.from('saved_outfits').insert({
@@ -1180,6 +1234,11 @@ export function OutfitGenerator({
     });
 
     setSaveMessage(saveError ? saveError.message : 'Образ сохранен в коллекцию.');
+    if (!saveError) {
+      onOutfitSaved?.();
+    }
+
+    setSavingOutfit(false);
   }
 
   async function remakeOutfit(label: string, instruction: string) {
@@ -1257,12 +1316,15 @@ export function OutfitGenerator({
     else setLoading(true);
 
     setError('');
-    setWeatherStatus('Проверяю погоду...');
+    const weatherPlace = getWeatherSearchPlace(cleanPlace);
+    setWeatherStatus(`Проверяю погоду: ${weatherPlace}...`);
     setForm(preparedForm);
 
     const weather = await fetchWeather(cleanPlace).catch(() => null);
     setWeatherInfo(weather);
-    setWeatherStatus(weather ? getWeatherText(weather) : 'Город не найден, поэтому образ собран без точной погоды.');
+    setWeatherStatus(
+      weather ? getWeatherText(weather) : `Погоду для "${weatherPlace}" найти не удалось, поэтому образ собран без точной погоды.`,
+    );
 
     try {
       const { data, error: invokeError } = await supabase.functions.invoke<{ text?: string; error?: string }>(
@@ -1388,7 +1450,7 @@ export function OutfitGenerator({
         {autoToday ? (
           <img className="today-hero-photo" src="/today-hero-miumiu-show.jpeg" alt="Показ Miu Miu на зеленом холме" />
         ) : (
-          <img className="today-hero-photo" src="/generator-magazines.jpg" alt="Глянцевые fashion-журналы на витрине" />
+          <img className="today-hero-photo" src="/generator-miumiu-hill.jpeg" alt="Показ Miu Miu на зеленом холме" />
         )}
       </div>
 
@@ -1506,19 +1568,7 @@ export function OutfitGenerator({
         </label>
 
         <label className="wide">
-          Какая вещь уже есть
-          <select value={form.wardrobeItemId} onChange={(e) => selectWardrobeItem(e.target.value)}>
-            <option value="">Выбрать вручную</option>
-            {wardrobeItems.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.name} · {item.item_type} · {item.color}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="wide">
-          Какая вещь уже есть
+          Тип вещи
           <select value={form.itemType} onChange={(e) => updateField('itemType', e.target.value)}>
             {visibleItemTypeOptions.map((option) => (
               <option key={option}>{option}</option>
@@ -1637,7 +1687,7 @@ export function OutfitGenerator({
             <img className="toolbar-photo result-head-photo" src="/generator-ready-look-clothes-rack.jpeg" alt="Fashion-иллюстрация для готового образа" />
             <h3>Готовый образ</h3>
           </div>
-          <button type="button" onClick={saveCurrentOutfit}>
+          <button type="button" onClick={saveCurrentOutfit} disabled={savingOutfit}>
             Сохранить образ
           </button>
         </div>
@@ -1740,12 +1790,16 @@ export function OutfitGenerator({
             <div className="clothing-item bottom" style={{ backgroundColor: palette[2].hex }}>
               <span>низ</span>
             </div>
+            {uploadedPhoto?.url && (
+              <img className="clothing-photo-reference" src={uploadedPhoto.url} alt="Фото выбранной вещи" />
+            )}
             <div className="clothing-item shoes" style={{ backgroundColor: palette[3].hex }}>
               <span>обувь</span>
             </div>
             <div className="clothing-item bag" style={{ backgroundColor: palette[4].hex }}>
               <span>сумка</span>
             </div>
+            <img className="look-preview-campaign-photo" src="/look-preview-sephora-pink.jpeg" alt="Розовый fashion campaign для образа" />
           </div>
         </div>
 

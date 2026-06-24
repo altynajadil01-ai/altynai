@@ -54,6 +54,40 @@ const colors = [
   'стальной синий',
 ];
 
+const colorHexByName: Record<string, string> = {
+  черный: '#171717',
+  белый: '#ffffff',
+  серый: '#8f9499',
+  'светло-серый': '#d7dde5',
+  графитовый: '#232832',
+  бежевый: '#d8c7ad',
+  молочный: '#f4efe7',
+  коричневый: '#6a4a35',
+  хаки: '#6f7652',
+  'синий деним': '#3f6f9f',
+  'темно-синий': '#1f365c',
+  бордовый: '#6f1836',
+  сливовый: '#8b6f2f',
+  винный: '#c95f82',
+  красный: '#b83b3b',
+  оранжевый: '#d98245',
+  желтый: '#efd96f',
+  зеленый: '#4f7d57',
+  голубой: '#86b6d9',
+  синий: '#2457a6',
+  'пудрово-розовый': '#f0a9bd',
+  розовый: '#e6a6b8',
+  'холодный мятный': '#6f8f9f',
+  'серый шалфей': '#7b8fa3',
+  'нежно-розовый': '#f6cfdc',
+  чернильный: '#243b5a',
+  'стальной синий': '#5f6f86',
+};
+
+function getColorHex(color: string) {
+  return colorHexByName[color] ?? '#d7dde5';
+}
+
 const emptyForm: WardrobeForm = {
   name: '',
   itemType: itemTypes[0],
@@ -155,11 +189,7 @@ export function Wardrobe({ userId, onUseItem }: { userId: string; onUseItem: (it
 
   async function addItem(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const name = form.name.trim();
-    if (!name) {
-      setMessage('Добавьте название вещи.');
-      return;
-    }
+    const name = `${form.itemType} ${form.color} ${form.season}`;
 
     setSaving(true);
     setMessage('');
@@ -256,11 +286,6 @@ export function Wardrobe({ userId, onUseItem }: { userId: string; onUseItem: (it
 
       <form className="wardrobe-panel" onSubmit={addItem}>
         <label>
-          Название
-          <input placeholder="например: черное худи" value={form.name} onChange={(e) => updateField('name', e.target.value)} />
-        </label>
-
-        <label>
           Тип
           <select value={form.itemType} onChange={(e) => updateField('itemType', e.target.value)}>
             {itemTypes.map((item) => (
@@ -271,11 +296,14 @@ export function Wardrobe({ userId, onUseItem }: { userId: string; onUseItem: (it
 
         <label>
           Цвет
-          <select value={form.color} onChange={(e) => updateField('color', e.target.value)}>
-            {colors.map((color) => (
-              <option key={color}>{color}</option>
-            ))}
-          </select>
+          <div className="color-select-row">
+            <select value={form.color} onChange={(e) => updateField('color', e.target.value)}>
+              {colors.map((color) => (
+                <option key={color}>{color}</option>
+              ))}
+            </select>
+            <span className="color-preview-dot" style={{ backgroundColor: getColorHex(form.color) }} aria-hidden="true" />
+          </div>
         </label>
 
         <label>
@@ -305,7 +333,7 @@ export function Wardrobe({ userId, onUseItem }: { userId: string; onUseItem: (it
         </div>
 
         <label>
-          Заметки
+          Дополнительные желания
           <input placeholder="например: oversize, теплая, для школы" value={form.notes} onChange={(e) => updateField('notes', e.target.value)} />
         </label>
 
@@ -358,9 +386,11 @@ export function Wardrobe({ userId, onUseItem }: { userId: string; onUseItem: (it
                 <div className="wardrobe-photo-placeholder">{item.item_type}</div>
               )}
               <div>
-                <span>{item.item_type} · {item.season}</span>
-                <h3>{item.name}</h3>
-                <p>{item.color}</p>
+                <div className="wardrobe-meta-list">
+                  <span>{item.item_type}</span>
+                  <span>{item.color}</span>
+                  <span>{item.season}</span>
+                </div>
                 {item.notes && <small>{item.notes}</small>}
               </div>
               <div className="wardrobe-card-actions">

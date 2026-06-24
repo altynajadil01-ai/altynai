@@ -34,10 +34,28 @@ type ProductForm = {
   notes: string;
 };
 
-type ShopifyCatalogProduct = {
+type DummyJsonProduct = {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  price: number;
+  thumbnail?: string;
+  images?: string[];
+  rating?: number;
+  stock?: number;
+  brand?: string;
+};
+
+type DummyJsonResponse = {
+  products: DummyJsonProduct[];
+};
+
+type DummyJsonCatalogProduct = {
   remoteId: string;
   brand: string;
   title: string;
+  category: string;
   itemType: string;
   color: string;
   season: string;
@@ -48,11 +66,6 @@ type ShopifyCatalogProduct = {
   imageUrl: string;
   productUrl: string;
   notes: string;
-};
-
-type ShopifyCatalogResponse = {
-  products?: ShopifyCatalogProduct[];
-  error?: string;
 };
 
 const itemTypes = ['футболка', 'рубашка', 'худи', 'свитер', 'кардиган', 'жакет', 'куртка', 'пальто', 'джинсы', 'брюки', 'юбка', 'платье', 'кроссовки', 'ботинки', 'сумка', 'аксессуар'];
@@ -88,6 +101,58 @@ const colors = [
   'стальной синий',
 ];
 const styles = ['спокойное', 'романтичное', 'уверенное', 'спортивное', 'элегантное', 'уличное', 'минималистичное', 'винтажное', 'деловое', 'праздничное', 'дерзкое', 'уютное'];
+const dummyJsonCategories = ['mens-shirts', 'mens-shoes', 'tops', 'womens-bags', 'womens-dresses', 'womens-shoes'];
+
+const fallbackDummyProducts: DummyJsonCatalogProduct[] = [
+  {
+    remoteId: 'dummyjson-fallback-dress',
+    brand: 'DummyJSON',
+    title: 'Pink Campaign Dress',
+    category: 'womens-dresses',
+    itemType: 'платье',
+    color: 'розовый',
+    season: 'всесезон',
+    style: 'романтичное',
+    budget: 'средний',
+    price: 79,
+    currency: 'USD',
+    imageUrl: '/look-preview-sephora-pink.jpeg',
+    productUrl: 'https://dummyjson.com/products/category/womens-dresses',
+    notes: 'Запасной демо-товар для прототипа, если DummyJSON временно не загрузился.',
+  },
+  {
+    remoteId: 'dummyjson-fallback-bag',
+    brand: 'DummyJSON',
+    title: 'Pink Fashion Bag',
+    category: 'womens-bags',
+    itemType: 'сумка',
+    color: 'пудрово-розовый',
+    season: 'всесезон',
+    style: 'уличное',
+    budget: 'средний',
+    price: 49,
+    currency: 'USD',
+    imageUrl: '/stylist-acne-studios.jpeg',
+    productUrl: 'https://dummyjson.com/products/category/womens-bags',
+    notes: 'Запасной демо-товар для прототипа, если DummyJSON временно не загрузился.',
+  },
+  {
+    remoteId: 'dummyjson-fallback-shoes',
+    brand: 'DummyJSON',
+    title: 'Pink Editorial Shoes',
+    category: 'womens-shoes',
+    itemType: 'кроссовки',
+    color: 'нежно-розовый',
+    season: 'всесезон',
+    style: 'элегантное',
+    budget: 'средний',
+    price: 59,
+    currency: 'USD',
+    imageUrl: '/look-preview-pink-campaign.jpeg',
+    productUrl: 'https://dummyjson.com/products/category/womens-shoes',
+    notes: 'Запасной демо-товар для прототипа, если DummyJSON временно не загрузился.',
+  },
+];
 
 const emptyForm: ProductForm = {
   brand: '',
@@ -109,6 +174,49 @@ function formatPrice(price: number | null, currency: string) {
   return `${Math.round(price).toLocaleString('ru-RU')} ${currency}`;
 }
 
+function getItemTypeFromDummyCategory(category: string) {
+  if (category.includes('shirt')) return 'рубашка';
+  if (category.includes('shoe')) return 'кроссовки';
+  if (category.includes('bag')) return 'сумка';
+  if (category.includes('dress')) return 'платье';
+  if (category === 'tops') return 'футболка';
+  return 'аксессуар';
+}
+
+function mapDummyProduct(product: DummyJsonProduct): DummyJsonCatalogProduct {
+  const imageUrl = product.thumbnail || product.images?.[0] || '';
+
+  return {
+    remoteId: `dummyjson-${product.id}`,
+    brand: product.brand || 'DummyJSON',
+    title: product.title,
+    category: product.category,
+    itemType: getItemTypeFromDummyCategory(product.category),
+    color: 'пудрово-розовый',
+    season: 'всесезон',
+    style: 'уличное',
+    budget: product.price <= 40 ? 'эконом' : product.price <= 90 ? 'средний' : 'премиум',
+    price: product.price,
+    currency: 'USD',
+    imageUrl,
+    productUrl: `https://dummyjson.com/products/${product.id}`,
+    notes: `${product.description} Источник: DummyJSON, категория ${product.category}.`,
+  };
+}
+
+async function fetchDummyProducts() {
+  const groups = await Promise.all(
+    dummyJsonCategories.map(async (category) => {
+      const response = await fetch(`https://dummyjson.com/products/category/${category}`);
+      if (!response.ok) throw new Error(`Не удалось загрузить ${category}`);
+      const data = (await response.json()) as DummyJsonResponse;
+      return data.products.map(mapDummyProduct);
+    }),
+  );
+
+  return groups.flat();
+}
+
 export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product: BrandProduct) => void; userId: string }) {
   const [products, setProducts] = useState<BrandProduct[]>([]);
   const [form, setForm] = useState<ProductForm>(emptyForm);
@@ -116,9 +224,10 @@ export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product
   const [favoritesOnly, setFavoritesOnly] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [shopifyQuery, setShopifyQuery] = useState('black blazer');
-  const [shopifyLoading, setShopifyLoading] = useState(false);
-  const [shopifyResults, setShopifyResults] = useState<ShopifyCatalogProduct[]>([]);
+  const [dummyQuery, setDummyQuery] = useState('dress');
+  const [dummyLoading, setDummyLoading] = useState(false);
+  const [dummyCatalog, setDummyCatalog] = useState<DummyJsonCatalogProduct[]>([]);
+  const [dummyResults, setDummyResults] = useState<DummyJsonCatalogProduct[]>([]);
   const [message, setMessage] = useState('');
 
   async function loadProducts() {
@@ -193,7 +302,7 @@ export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product
       budget: form.budget,
       price,
       currency: form.currency.trim() || 'KZT',
-      image_url: form.imageUrl.trim(),
+      image_url: '',
       product_url: productUrl,
       notes: form.notes.trim(),
     });
@@ -228,33 +337,42 @@ export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product
     }
   }
 
-  async function searchShopifyProducts(e: React.FormEvent<HTMLFormElement>) {
+  async function searchDummyProducts(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const query = shopifyQuery.trim();
-    if (!query) {
-      setMessage('Напишите, что найти в Shopify.');
-      return;
-    }
+    const query = dummyQuery.trim().toLowerCase();
 
-    setShopifyLoading(true);
+    setDummyLoading(true);
     setMessage('');
 
-    const { data, error } = await supabase.functions.invoke<ShopifyCatalogResponse>('shopify-products', {
-      body: { query, limit: 12 },
-    });
+    try {
+      const catalog = dummyCatalog.length > 0 ? dummyCatalog : await fetchDummyProducts();
+      setDummyCatalog(catalog);
 
-    if (error || data?.error) {
-      setMessage(data?.error ?? error?.message ?? 'Shopify пока не ответил.');
-      setShopifyResults([]);
-    } else {
-      setShopifyResults(data?.products ?? []);
-      if ((data?.products ?? []).length === 0) setMessage('Shopify ничего не нашел по этому запросу.');
+      const results = query
+        ? catalog.filter((product) =>
+            [product.title, product.brand, product.category, product.itemType, product.notes].some((value) =>
+              value.toLowerCase().includes(query),
+            ),
+          )
+        : catalog;
+
+      const visibleResults = results.length > 0 ? results : catalog;
+      setDummyResults(visibleResults.slice(0, 18));
+      if (results.length === 0) setMessage('По запросу ничего не нашлось, поэтому показаны все товары DummyJSON.');
+    } catch (error) {
+      setDummyCatalog(fallbackDummyProducts);
+      setDummyResults(fallbackDummyProducts);
+      setMessage(
+        error instanceof Error
+          ? `${error.message}. Показаны запасные демо-товары.`
+          : 'DummyJSON пока не ответил. Показаны запасные демо-товары.',
+      );
     }
 
-    setShopifyLoading(false);
+    setDummyLoading(false);
   }
 
-  async function addShopifyProduct(product: ShopifyCatalogProduct) {
+  async function addDummyProduct(product: DummyJsonCatalogProduct) {
     setSaving(true);
     setMessage('');
 
@@ -276,7 +394,7 @@ export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product
 
     if (error) setMessage(error.message);
     else {
-      setMessage('Товар из Shopify добавлен в каталог.');
+      setMessage('Товар из DummyJSON добавлен в каталог.');
       await loadProducts();
     }
 
@@ -298,20 +416,20 @@ export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product
         <img className="today-hero-photo" src="/brand-catalog-hero-miu.jpeg" alt="Лейблы модных брендов крупным планом" />
       </div>
 
-      <section className="shopify-panel">
+      <section className="api-products-panel">
         <div className="catalog-head">
-          <h3>Найти товары из Shopify</h3>
-          <p>Введи запрос на английском или русском: jacket, bag, sneakers, black jeans. Найденные товары можно сразу добавить в каталог.</p>
+          <h3>Товары из DummyJSON</h3>
+          <p>Загрузи демо-одежду из API: рубашки, обувь, топы, сумки и платья. Можно оставить поле пустым, чтобы увидеть все товары.</p>
         </div>
-        <form className="shopify-search" onSubmit={searchShopifyProducts}>
-          <input value={shopifyQuery} onChange={(e) => setShopifyQuery(e.target.value)} placeholder="например: black blazer" />
-          <button type="submit" disabled={shopifyLoading}>
-            {shopifyLoading ? 'Ищу...' : 'Найти товары'}
+        <form className="api-products-search" onSubmit={searchDummyProducts}>
+          <input value={dummyQuery} onChange={(e) => setDummyQuery(e.target.value)} placeholder="например: dress, shoes, bag" />
+          <button type="submit" disabled={dummyLoading}>
+            {dummyLoading ? 'Загружаю...' : 'Загрузить товары'}
           </button>
         </form>
-        {shopifyResults.length > 0 && (
+        {dummyResults.length > 0 && (
           <div className="product-grid compact">
-            {shopifyResults.map((product) => (
+            {dummyResults.map((product) => (
               <article className="product-card" key={product.remoteId}>
                 {product.imageUrl ? (
                   <img alt={product.title} src={product.imageUrl} />
@@ -329,7 +447,7 @@ export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product
                   </div>
                 </div>
                 <div className="product-actions">
-                  <button type="button" onClick={() => addShopifyProduct(product)} disabled={saving}>
+                  <button type="button" onClick={() => addDummyProduct(product)} disabled={saving}>
                     Добавить
                   </button>
                   {product.productUrl && (
@@ -401,7 +519,7 @@ export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product
         </label>
 
         <label>
-          Цена
+          Цена (не обязательно)
           <input inputMode="numeric" placeholder="например: 29990" value={form.price} onChange={(e) => updateField('price', e.target.value)} />
         </label>
 
@@ -413,11 +531,6 @@ export function BrandProducts({ onUseProduct, userId }: { onUseProduct: (product
         <label className="wide">
           Ссылка на товар
           <input placeholder="https://..." value={form.productUrl} onChange={(e) => updateField('productUrl', e.target.value)} />
-        </label>
-
-        <label className="wide">
-          Ссылка на картинку
-          <input placeholder="https://...jpg" value={form.imageUrl} onChange={(e) => updateField('imageUrl', e.target.value)} />
         </label>
 
         <label className="wide">

@@ -136,10 +136,6 @@ export function Profile({ userId, userEmail }: { userId: string; userEmail: stri
     setForm((current) => ({ ...current, [field]: value }));
   }
 
-  function updateAvoidDresses(value: boolean) {
-    setForm((current) => ({ ...current, avoidDresses: value }));
-  }
-
   function toggleColor(color: string) {
     setForm((current) => {
       const hasColor = current.favoriteColors.includes(color);
@@ -252,11 +248,6 @@ export function Profile({ userId, userEmail }: { userId: string; userEmail: stri
             value={form.preferredBrands}
             onChange={(e) => updateField('preferredBrands', e.target.value)}
           />
-        </label>
-
-        <label className="wide filter-check inline">
-          <input checked={form.avoidDresses} onChange={(e) => updateAvoidDresses(e.target.checked)} type="checkbox" />
-          Не предлагать платья в генераторе
         </label>
 
         <div className="wide profile-colors">
