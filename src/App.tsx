@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
 import { Auth } from './components/Auth';
-import { BrandProducts, type BrandProduct } from './components/BrandProducts';
+import type { BrandProduct } from './components/BrandProducts';
 import { Onboarding } from './components/Onboarding';
 import { OutfitGenerator } from './components/OutfitGenerator';
 import { Profile } from './components/Profile';
@@ -10,7 +10,7 @@ import { SavedOutfits } from './components/SavedOutfits';
 import { TheStylist } from './components/TheStylist';
 import { Wardrobe } from './components/Wardrobe';
 
-type AppPage = 'stylist' | 'generator' | 'wardrobe' | 'brands' | 'profile' | 'collection';
+type AppPage = 'stylist' | 'generator' | 'wardrobe' | 'profile' | 'collection';
 
 export type WardrobePick = {
   id: string;
@@ -129,9 +129,6 @@ export default function App() {
               <button className={page === 'wardrobe' ? 'active' : ''} onClick={() => setPage('wardrobe')} type="button">
                 Гардероб
               </button>
-              <button className={page === 'brands' ? 'active' : ''} onClick={() => setPage('brands')} type="button">
-                Бренды
-              </button>
               <button className={page === 'profile' ? 'active' : ''} onClick={() => setPage('profile')} type="button">
                 Профиль
               </button>
@@ -158,14 +155,6 @@ export default function App() {
           onUseItem={(item) => {
             setSelectedWardrobeItem(item);
             setSelectedProduct(null);
-            setPage('generator');
-          }}
-        />
-      ) : page === 'brands' ? (
-        <BrandProducts
-          userId={session.user.id}
-          onUseProduct={(product) => {
-            setSelectedProduct(product);
             setPage('generator');
           }}
         />
