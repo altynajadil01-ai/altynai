@@ -41,10 +41,11 @@ export function Auth() {
     setGoogleBusy(true);
     setMessage('');
 
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
         redirectTo: getAuthRedirectUrl(),
+        skipBrowserRedirect: true,
         queryParams: {
           prompt: 'select_account',
         },
@@ -54,7 +55,16 @@ export function Auth() {
     if (error) {
       setGoogleBusy(false);
       setMessage(getGoogleAuthMessage(error.message));
+      return;
     }
+
+    if (data.url) {
+      window.location.assign(data.url);
+      return;
+    }
+
+    setGoogleBusy(false);
+    setMessage('Не получилось открыть Google-вход. Попробуй еще раз.');
   }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
