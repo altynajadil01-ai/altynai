@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './lib/supabase';
 import { Auth } from './components/Auth';
-import { AppRating } from './components/AppRating';
 import { BrandProducts, type BrandProduct } from './components/BrandProducts';
 import { Onboarding } from './components/Onboarding';
 import { OutfitGenerator } from './components/OutfitGenerator';
@@ -11,7 +10,7 @@ import { SavedOutfits } from './components/SavedOutfits';
 import { TheStylist } from './components/TheStylist';
 import { Wardrobe } from './components/Wardrobe';
 
-type AppPage = 'stylist' | 'generator' | 'wardrobe' | 'brands' | 'profile' | 'collection' | 'rating';
+type AppPage = 'stylist' | 'generator' | 'wardrobe' | 'brands' | 'profile' | 'collection';
 
 export type WardrobePick = {
   id: string;
@@ -139,9 +138,6 @@ export default function App() {
               <button className={page === 'collection' ? 'active' : ''} onClick={() => setPage('collection')} type="button">
                 Коллекция
               </button>
-              <button className={page === 'rating' ? 'active' : ''} onClick={() => setPage('rating')} type="button">
-                Оценка
-              </button>
             </nav>
           </div>
         )}
@@ -177,8 +173,6 @@ export default function App() {
         <Profile userId={session.user.id} userEmail={session.user.email ?? ''} />
       ) : page === 'collection' ? (
         <SavedOutfits userId={session.user.id} />
-      ) : page === 'rating' ? (
-        <AppRating userId={session.user.id} />
       ) : (
         <OutfitGenerator
           autoToday={false}
