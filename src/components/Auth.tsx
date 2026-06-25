@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
 async function ensureProfile(userId: string, userEmail: string) {
@@ -29,6 +29,32 @@ function getAuthRedirectUrl() {
   return `${window.location.origin}/`;
 }
 
+function getOAuthErrorFromUrl() {
+  const searchParams = new URLSearchParams(window.location.search);
+  const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+  const error =
+    searchParams.get('error_description') ??
+    searchParams.get('error') ??
+    hashParams.get('error_description') ??
+    hashParams.get('error');
+
+  if (!error) {
+    return '';
+  }
+
+  const lowerError = error.toLowerCase();
+
+  if (lowerError.includes('redirect_uri_mismatch')) {
+    return 'Google OAuth настроен неправильно: добавь Supabase callback URL в Google Cloud Console.';
+  }
+
+  if (lowerError.includes('access_denied')) {
+    return 'Google не разрешил вход. Если приложение в Testing, добавь свой email в Test users в Google Cloud Console.';
+  }
+
+  return `Google-вход не завершился: ${error}`;
+}
+
 export function Auth() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -36,6 +62,15 @@ export function Auth() {
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [googleBusy, setGoogleBusy] = useState(false);
+
+  useEffect(() => {
+    const oauthError = getOAuthErrorFromUrl();
+
+    if (oauthError) {
+      setMessage(oauthError);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
 
   async function handleGoogleSignIn() {
     setGoogleBusy(true);
