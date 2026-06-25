@@ -249,148 +249,6 @@
         gap: 18px;
       }
 
-      .skins-layout {
-        grid-template-rows: auto 1fr;
-      }
-
-      .skins-grid {
-        z-index: 1;
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 18px;
-      }
-
-      .skin-card {
-        display: grid;
-        gap: 14px;
-        padding: 16px;
-        background: var(--paper);
-        box-shadow: 0 14px 24px rgba(58, 53, 39, 0.2);
-      }
-
-      .skin-preview {
-        min-height: 330px;
-        display: grid;
-        gap: 12px;
-        align-content: start;
-        padding: 18px;
-        overflow: hidden;
-        border: 1px solid rgba(32, 32, 32, 0.16);
-      }
-
-      .skin-preview header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        font-size: 10px;
-        font-weight: 900;
-        text-transform: uppercase;
-      }
-
-      .skin-preview h3 {
-        margin: 0;
-        font-family: "Bebas Neue", Impact, sans-serif;
-        font-size: 42px;
-        font-weight: 400;
-        line-height: 0.9;
-        text-transform: uppercase;
-      }
-
-      .skin-tabs,
-      .skin-row {
-        display: flex;
-        gap: 6px;
-      }
-
-      .skin-tabs span,
-      .skin-pill {
-        padding: 7px 8px;
-        font-size: 9px;
-        font-weight: 900;
-        text-transform: uppercase;
-      }
-
-      .skin-panel {
-        min-height: 106px;
-        display: grid;
-        align-content: end;
-        gap: 8px;
-        padding: 14px;
-      }
-
-      .skin-line {
-        height: 7px;
-        width: 100%;
-      }
-
-      .skin-line.short {
-        width: 64%;
-      }
-
-      .skin-preview.pink-studio {
-        background:
-          linear-gradient(135deg, rgba(255, 250, 243, 0.96), rgba(247, 201, 215, 0.96)),
-          #fffaf3;
-      }
-
-      .pink-studio .skin-tabs span,
-      .pink-studio .skin-panel,
-      .pink-studio .skin-pill {
-        background: #fff;
-        border: 1px solid rgba(220, 115, 159, 0.32);
-      }
-
-      .pink-studio .skin-line {
-        background: #dc739f;
-      }
-
-      .skin-preview.black-line {
-        background: #f7f2ea;
-        color: #111;
-      }
-
-      .black-line .skin-tabs span,
-      .black-line .skin-panel,
-      .black-line .skin-pill {
-        background: #f7f2ea;
-        border: 1px solid #111;
-      }
-
-      .black-line .skin-line {
-        background: #111;
-      }
-
-      .skin-preview.soft-wardrobe {
-        background:
-          linear-gradient(120deg, rgba(183, 189, 122, 0.2), transparent 42%),
-          #fffaf3;
-      }
-
-      .soft-wardrobe .skin-tabs span,
-      .soft-wardrobe .skin-panel,
-      .soft-wardrobe .skin-pill {
-        background: #ffffff;
-        border: 1px solid rgba(183, 189, 122, 0.48);
-      }
-
-      .soft-wardrobe .skin-line {
-        background: #9ca360;
-      }
-
-      .skin-card strong {
-        display: block;
-        font-family: "Bebas Neue", Impact, sans-serif;
-        font-size: 34px;
-        font-weight: 400;
-        line-height: 0.9;
-        text-transform: uppercase;
-      }
-
-      .skin-card p {
-        font-size: 13px;
-      }
-
       .main-shot img {
         height: 430px;
         object-position: top center;
@@ -554,7 +412,6 @@
 
         .two-col,
         .screens-grid,
-        .skins-grid,
         .demo-layout,
         .qr-layout,
         .points {
@@ -661,62 +518,7 @@
         <span class="slide-number">03</span>
       </section>
 
-      <section class="slide skins-layout" aria-label="Slide 4">
-        <div class="screens-head">
-          <div>
-            <span class="eyebrow">Slide 4</span>
-            <h2>Новые скины</h2>
-          </div>
-          <p>Три визуальных направления для StyleLab: розовый fashion-кабинет, строгая черная линия и мягкий гардеробный стиль.</p>
-        </div>
-        <div class="skins-grid">
-          <article class="skin-card">
-            <div class="skin-preview pink-studio">
-              <header><span>StyleLab</span><span>Pink</span></header>
-              <h3>Studio</h3>
-              <div class="skin-tabs"><span>Стилист</span><span>Генератор</span><span>Коллекция</span></div>
-              <div class="skin-panel">
-                <div class="skin-line"></div>
-                <div class="skin-line short"></div>
-              </div>
-              <div class="skin-row"><span class="skin-pill">AI look</span><span class="skin-pill">Mood</span></div>
-            </div>
-            <strong>Pink Studio</strong>
-            <p>Главный романтичный скин: светлый фон, розовый акцент и fashion-настроение.</p>
-          </article>
-          <article class="skin-card">
-            <div class="skin-preview black-line">
-              <header><span>StyleLab</span><span>Line</span></header>
-              <h3>Black</h3>
-              <div class="skin-tabs"><span>Стилист</span><span>Гардероб</span><span>Коллекция</span></div>
-              <div class="skin-panel">
-                <div class="skin-line"></div>
-                <div class="skin-line short"></div>
-              </div>
-              <div class="skin-row"><span class="skin-pill">Clean</span><span class="skin-pill">Sharp</span></div>
-            </div>
-            <strong>Black Line</strong>
-            <p>Более взрослый вариант: четкие границы, меньше декора и аккуратная навигация.</p>
-          </article>
-          <article class="skin-card">
-            <div class="skin-preview soft-wardrobe">
-              <header><span>StyleLab</span><span>Soft</span></header>
-              <h3>Wardrobe</h3>
-              <div class="skin-tabs"><span>Профиль</span><span>Гардероб</span><span>Looks</span></div>
-              <div class="skin-panel">
-                <div class="skin-line"></div>
-                <div class="skin-line short"></div>
-              </div>
-              <div class="skin-row"><span class="skin-pill">Daily</span><span class="skin-pill">Cozy</span></div>
-            </div>
-            <strong>Soft Wardrobe</strong>
-            <p>Спокойный скин для ежедневного выбора образа: тепло, чисто и удобно.</p>
-          </article>
-        </div>
-        <span class="slide-number">04</span>
-      </section>
-
-      <section class="slide demo-layout" aria-label="Slide 5">
+      <section class="slide demo-layout" aria-label="Slide 4">
         <div class="video-frame">
           <video id="demoVideo" src="/demo.mp4" controls poster="/presentation-app-screen.png"></video>
           <div class="video-note" id="videoNote">
@@ -725,7 +527,7 @@
           </div>
         </div>
         <div class="content">
-          <span class="eyebrow">Slide 5</span>
+          <span class="eyebrow">Slide 4</span>
           <h2>Demo</h2>
           <p class="statement">
             Адиль Алтынай показывает, как в StyleLab выбрать параметры, получить AI-образ и сохранить результат в коллекцию.
@@ -736,12 +538,12 @@
             <span>Save outfit</span>
           </div>
         </div>
-        <span class="slide-number">05</span>
+        <span class="slide-number">04</span>
       </section>
 
-      <section class="slide qr-layout" aria-label="Slide 6">
+      <section class="slide qr-layout" aria-label="Slide 5">
         <div class="content">
-          <span class="eyebrow">Slide 6</span>
+          <span class="eyebrow">Slide 5</span>
           <h2>Try StyleLab</h2>
           <p class="cta">Собирайте образы увереннее, быстрее и эстетичнее.</p>
           <div class="chips">
@@ -754,7 +556,7 @@
           <img src="/stylelab-qr.png" alt="QR code на приложение StyleLab" />
           <p class="site-link" id="siteLink"></p>
         </div>
-        <span class="slide-number">06</span>
+        <span class="slide-number">05</span>
       </section>
     </main>
 
